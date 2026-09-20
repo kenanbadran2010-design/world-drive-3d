@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>World Drive — Real Earth 3D</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.css"/>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body,#map{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui;background:#111;touch-action:none}
+#map{position:absolute;inset:0}.glass{background:#07131ddd;color:white;border:1px solid #ffffff30;backdrop-filter:blur(9px);box-shadow:0 6px 22px #0008}
+#search{position:fixed;z-index:20;left:50%;top:max(8px,env(safe-area-inset-top));transform:translateX(-50%);width:min(610px,92vw);padding:7px;border-radius:14px;display:flex;gap:5px}
+#search input{min-width:0;flex:1;padding:10px;border:0;border-radius:8px;font-size:15px}button{border:1px solid #ffffff44;background:#155779;color:white;border-radius:8px;padding:8px;font-weight:750}
+#hud{position:fixed;z-index:20;left:10px;top:70px;padding:10px 12px;border-radius:13px;min-width:170px}.speed{font-size:29px;font-weight:900}.tiny{font-size:10px;opacity:.75}
+#nav{position:fixed;z-index:20;right:10px;top:70px;width:190px;padding:9px;border-radius:13px}.turn{font-size:30px;color:#61d9ff;font-weight:900}
+#env{position:fixed;z-index:20;left:10px;top:175px;padding:6px;border-radius:10px}#env button{font-size:11px;padding:5px}
+#controls{position:fixed;z-index:25;left:12px;right:12px;bottom:max(14px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;pointer-events:none}.grp{display:flex;gap:9px;align-items:end}
+.ctrl{pointer-events:auto;width:70px;height:70px;border-radius:50%;border:2px solid #fff8;background:#102536d9;color:white;font-size:28px;display:flex;align-items:center;justify-content:center;user-select:none}.gas{height:90px;background:#18784ddd}.brake{height:80px;background:#9a3636dd}
+.car{width:25px;height:44px;background:#d71920;border:3px solid #650b0b;border-radius:7px;box-shadow:0 4px 15px #000;position:relative}.car:before{content:"";position:absolute;left:3px;right:3px;top:7px;height:13px;background:#163a50;border-radius:3px}.car:after{content:"";position:absolute;left:4px;right:4px;bottom:5px;height:4px;background:#ff3d32;border-radius:2px}
+#fx{position:fixed;inset:0;z-index:10;pointer-events:none;display:none}
+#toast{position:fixed;z-index:40;left:50%;top:46%;transform:translate(-50%,-50%);padding:12px 16px;border-radius:12px;opacity:0;transition:.25s;text-align:center;max-width:80vw}
+.maplibregl-ctrl-attrib{font-size:9px!important;opacity:.75}
+</style>
+</head>
+<body>
+<div id="map"></div><div id="fx"></div>
+<div id="search" class="glass"><input id="query" value="Dubai Mall" placeholder="Search a real place, city or landmark"><button onclick="searchPlace()">FIND</button><button onclick="routeTo()">GPS</button></div>
+<div id="hud" class="glass"><b>WORLD DRIVE</b><br><span id="speed" class="speed">0</span> km/h<br><span id="place">Abu Dhabi, UAE</span><div class="tiny">REAL EARTH 3D • LIVE DATA</div></div>
+<div id="nav" class="glass"><b>GPS</b><div><span id="turnIcon" class="turn">↑</span> <span id="instruction">Search a destination</span></div><div id="routeInfo" class="tiny"></div></div>
+<div id="env" class="glass"><button onclick="setDay()">☀ Day</button><button onclick="setNight()">🌙 Night</button><button onclick="clearFx()">Clear</button><button onclick="rainFx()">🌧 Rain</button><button onclick="fogFx()">🌫 Fog</button></div>
+<div id="controls"><div class="grp"><div class="ctrl" data-k="l">◀</div><div class="ctrl" data-k="r">▶</div></div><div class="grp"><div class="ctrl brake" data-k="b">▼</div><div class="ctrl gas" data-k="g">▲</div></div></div>
+<div id="toast" class="glass"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.js"></script>
+<script>
+const START={lng:54.3773,lat:24.4539};
+let pos={...START}, bearing=0, speed=0, dest=null, route=null, steps=[], keys={}, last=performance.now();
+
+const map=new maplibregl.Map({
+ container:'map',
+ style:'https://tiles.openfreemap.org/styles/liberty',
+ center:[pos.lng,pos.lat],zoom:17.2,pitch:72,bearing:0,
+ canvasContextAttributes:{antialias:true},
+ attributionControl:true
+});
+
+const carEl=document.createElement('div');carEl.className='car';
+const car=new maplibregl.Marker({element:carEl,rotationAlignment:'map',pitchAlignment:'map'}).setLngLat([pos.lng,pos.lat]).addTo(map);
+
+map.on('load',()=>{
+ try{
+   map.addSource('ofm3d',{type:'vector',url:'https://tiles.openfreemap.org/planet'});
+   const labels=(map.getStyle().layers||[]).find(l=>l.type==='symbol' && l.layout && l.layout['text-field']);
+   map.addLayer({
+     id:'real-3d-buildings',type:'fill-extrusion',source:'ofm3d','source-layer':'building',minzoom:15,
+     filter:['!=',['get','hide_3d'],true],
+     paint:{
+       'fill-extrusion-color':['interpolate',['linear'],['coalesce',['get','render_height'],0],0,'#d6d1c8',80,'#c2beb6',250,'#a9b5bf'],
+       'fill-extrusion-height':['interpolate',['linear'],['zoom'],15,0,16,['coalesce',['get','render_height'],['get','height'],6]],
+       'fill-extrusion-base':['coalesce',['get','render_min_height'],0],
+       'fill-extrusion-opacity':.92
+     }
+   },labels&&labels.id);
+ }catch(e){console.warn('3D building layer:',e)}
+});
+
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.opacity=1;setTimeout(()=>e.style.opacity=0,2200)}
+
+async function searchPlace(){
+ const q=document.getElementById('query').value.trim(); if(!q)return;
+ try{
+   const u='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&q='+encodeURIComponent(q);
+   const r=await fetch(u,{headers:{Accept:'application/json'}}); const a=await r.json();
+   if(!a.length){toast('Place not found');return}
+   dest={lng:+a[0].lon,lat:+a[0].lat,name:a[0].display_name};
+   new maplibregl.Popup().setLngLat([dest.lng,dest.lat]).setHTML('<b>'+q.replace(/[<>]/g,'')+'</b>').addTo(map);
+   map.flyTo({center:[dest.lng,dest.lat],zoom:17,pitch:70,duration:1400});
+   toast('Found real location: '+q);
+   setTimeout(()=>map.flyTo({center:[pos.lng,pos.lat],zoom:17.2,pitch:72,duration:1000}),1700);
+ }catch(e){toast('Live place search could not connect')}
+}
+
+async function routeTo(){
+ if(!dest){await searchPlace();if(!dest)return}
+ try{
+   const u=`https://router.project-osrm.org/route/v1/driving/${pos.lng},${pos.lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson&steps=true`;
+   const r=await fetch(u);const j=await r.json();if(!j.routes||!j.routes.length){toast('No road route found');return}
+   route=j.routes[0];steps=(route.legs[0]&&route.legs[0].steps)||[];
+   const data={type:'Feature',properties:{},geometry:route.geometry};
+   if(map.getSource('gps-route'))map.getSource('gps-route').setData(data);
+   else{map.addSource('gps-route',{type:'geojson',data});map.addLayer({id:'gps-route-line',type:'line',source:'gps-route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#14bfff','line-width':8,'line-opacity':.9}})}
+   updateNav();toast('Real road route loaded');
+ }catch(e){toast('Live routing could not connect')}
+}
+function hav(a,b){const R=6371000,p1=a.lat*Math.PI/180,p2=b.lat*Math.PI/180,dp=(b.lat-a.lat)*Math.PI/180,dl=(b.lng-a.lng)*Math.PI/180;const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+function updateNav(){
+ if(!route)return;
+ const remain=dest?hav(pos,dest):0;
+ let best=null,bd=1e20;
+ for(const s of steps){if(!s.maneuver||!s.maneuver.location)continue;const d=hav(pos,{lng:s.maneuver.location[0],lat:s.maneuver.location[1]});if(d<bd){bd=d;best=s}}
+ if(best){
+   const type=(best.maneuver.type||'continue').replaceAll('_',' '),mod=best.maneuver.modifier||'straight';
+   const icons={left:'←',right:'→','slight left':'↖','slight right':'↗','sharp left':'↙','sharp right':'↘',straight:'↑','u-turn':'↩'};
+   document.getElementById('turnIcon').textContent=icons[mod]||'↑';
+   document.getElementById('instruction').textContent=(type+' '+mod).replace('continue straight','Continue straight');
+   document.getElementById('routeInfo').textContent=Math.round(bd)+' m to next maneuver • '+(remain/1000).toFixed(1)+' km straight-line to destination';
+ }
+}
+
+document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;b.onpointerdown=e=>{e.preventDefault();keys[k]=1};b.onpointerup=b.onpointercancel=()=>keys[k]=0});
+addEventListener('keydown',e=>{if(['w','ArrowUp'].includes(e.key))keys.g=1;if(['s','ArrowDown'].includes(e.key))keys.b=1;if(['a','ArrowLeft'].includes(e.key))keys.l=1;if(['d','ArrowRight'].includes(e.key))keys.r=1});
+addEventListener('keyup',()=>keys={});
+
+function setDay(){clearFx();map.setSky&&map.setSky({});document.getElementById('fx').style.display='none'}
+function setNight(){const f=document.getElementById('fx');f.style.cssText='display:block;background:#06142b88;mix-blend-mode:multiply'}
+function clearFx(){document.getElementById('fx').style.display='none'}
+function rainFx(){const f=document.getElementById('fx');f.style.cssText='display:block;background:repeating-linear-gradient(105deg,transparent 0 13px,#d8f2ff77 14px 15px,transparent 16px 31px)'}
+function fogFx(){const f=document.getElementById('fx');f.style.cssText='display:block;background:#e3ecee88;backdrop-filter:blur(1.2px)'}
+
+function frame(now){
+ requestAnimationFrame(frame);let dt=Math.min(.035,(now-last)/1000);last=now;
+ if(keys.g)speed=Math.min(150,speed+42*dt);else speed*=Math.pow(.975,dt*60);
+ if(keys.b)speed=Math.max(-28,speed-65*dt);
+ if(Math.abs(speed)>1){const steer=72*dt*Math.min(1,Math.abs(speed)/35);if(keys.l)bearing-=steer*Math.sign(speed);if(keys.r)bearing+=steer*Math.sign(speed)}
+ const meters=speed/3.6*dt,rad=bearing*Math.PI/180;
+ pos.lat+=Math.cos(rad)*meters/111320;pos.lng+=Math.sin(rad)*meters/(111320*Math.cos(pos.lat*Math.PI/180));
+ car.setLngLat([pos.lng,pos.lat]).setRotation(bearing);
+ map.jumpTo({center:[pos.lng,pos.lat],bearing:-bearing,pitch:72,zoom:17.2});
+ document.getElementById('speed').textContent=Math.round(Math.abs(speed));
+ if(route&&Math.floor(now/1000)!==Math.floor((now-dt*1000)/1000))updateNav();
+}
+requestAnimationFrame(frame);
+</script></body></html>
