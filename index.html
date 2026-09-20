@@ -3,152 +3,964 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<title>World Drive 3D — Satellite Edition</title>
-<link href="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.css" rel="stylesheet">
+<title>World Drive 3D — Real Earth</title>
+
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.10.0/dist/maplibre-gl.css">
+
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body,#map{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,system-ui,sans-serif;background:#081018;touch-action:none}
-#map{position:absolute;inset:0}
-.glass{background:#06131ddd;color:#fff;border:1px solid #ffffff38;backdrop-filter:blur(10px);box-shadow:0 8px 30px #0008}
-#top{position:fixed;z-index:20;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(720px,94vw);display:flex;gap:6px;padding:7px;border-radius:15px}
-#q{flex:1;min-width:0;border:0;border-radius:9px;padding:11px;font-size:15px}
-button{border:1px solid #ffffff50;border-radius:9px;background:#145f88;color:#fff;padding:9px 11px;font-weight:800}
-#hud{position:fixed;z-index:20;left:10px;top:72px;padding:10px 13px;border-radius:14px}
-#speed{font-size:34px;font-weight:950}
-#gps{position:fixed;z-index:20;right:10px;top:72px;width:min(245px,45vw);padding:10px;border-radius:14px}
-#arrow{font-size:32px;color:#42d7ff}
-#badge{position:fixed;z-index:20;left:10px;top:178px;padding:7px 9px;border-radius:11px;font-size:11px}
-#controls{position:fixed;z-index:30;left:12px;right:12px;bottom:max(14px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;pointer-events:none}
-.cluster{display:flex;gap:10px;align-items:flex-end}
-.ctrl{pointer-events:auto;width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:#102b3ee8;border:2px solid #ffffffa0;color:#fff;font-size:30px;font-weight:900;user-select:none}
-.gas{height:96px;background:#147849e8}.brake{height:84px;background:#9d3232e8}
-#carWrap{position:fixed;z-index:18;left:50%;bottom:76px;transform:translateX(-50%);width:122px;height:72px;pointer-events:none;filter:drop-shadow(0 14px 9px #000a)}
-.car{position:absolute;left:17px;top:7px;width:88px;height:54px;border-radius:22px 22px 12px 12px;background:linear-gradient(90deg,#d7b900 0 10%,#ffd900 20% 80%,#b89b00 100%);border:2px solid #292000;box-shadow:inset 0 -8px 0 #b99b00}
-.car:before{content:"";position:absolute;left:19px;top:6px;width:48px;height:19px;border-radius:13px 13px 5px 5px;background:linear-gradient(#17242b,#31586a);border:2px solid #111}
-.car:after{content:"M4";position:absolute;right:8px;bottom:7px;font:900 9px Arial;color:#111}
-.wheel{position:absolute;width:14px;height:26px;background:#111;border-radius:5px;top:34px}.w1{left:12px}.w2{right:12px}
-.tail{position:absolute;bottom:10px;width:20px;height:5px;background:#f33;border-radius:4px}.t1{left:12px}.t2{right:12px}
-#toast{position:fixed;z-index:50;left:50%;top:48%;transform:translate(-50%,-50%);padding:13px 17px;border-radius:12px;opacity:0;transition:.25s;max-width:80vw;text-align:center}
-#loading{position:fixed;z-index:60;inset:0;display:grid;place-items:center;background:#07111a;color:#fff;font-weight:900}
-.maplibregl-ctrl-attrib{font-size:9px!important}
-@media(max-width:600px){#gps{top:142px;width:190px}#badge{top:142px}.ctrl{width:64px;height:64px}#carWrap{bottom:69px;transform:translateX(-50%) scale(.88)}}
+
+html,body,#map{
+ margin:0;width:100%;height:100%;overflow:hidden;
+ background:#071019;font-family:system-ui,sans-serif;
+ touch-action:none
+}
+
+#map{position:fixed;inset:0}
+
+.panel{
+ background:#07131ee6;color:white;
+ border:1px solid #ffffff2d;
+ backdrop-filter:blur(12px);
+ box-shadow:0 8px 28px #0008
+}
+
+#search{
+ position:fixed;z-index:20;
+ top:max(10px,env(safe-area-inset-top));
+ left:50%;transform:translateX(-50%);
+ width:min(760px,94vw);
+ padding:7px;border-radius:15px;
+ display:flex;gap:6px
+}
+
+#q{
+ flex:1;min-width:0;border:0;
+ border-radius:10px;padding:12px;font-size:16px
+}
+
+button{
+ border:0;border-radius:10px;
+ padding:10px 12px;
+ background:#0878b9;color:white;
+ font-weight:800
+}
+
+#hud{
+ position:fixed;z-index:20;
+ left:10px;top:74px;
+ padding:10px 13px;border-radius:14px;
+ min-width:105px
+}
+
+#speed{
+ font-size:34px;font-weight:950;line-height:1
+}
+
+.small{font-size:11px;opacity:.75}
+
+#gps{
+ position:fixed;z-index:20;
+ right:10px;top:74px;
+ width:min(270px,48vw);
+ padding:10px;border-radius:14px
+}
+
+#turn{font-size:18px;font-weight:850}
+#status{font-size:11px;opacity:.75;margin-top:5px}
+
+.ctrl{
+ position:fixed;z-index:25;
+ bottom:max(18px,env(safe-area-inset-bottom));
+ user-select:none
+}
+
+.pad{
+ width:72px;height:72px;
+ border-radius:50%;
+ display:grid;place-items:center;
+ font-size:30px;
+ background:#07131ed9;
+ border:1px solid #ffffff55;
+ color:#fff
+}
+
+.left{left:16px}
+.right{left:96px}
+
+.gas{
+ right:16px;
+ width:82px;height:82px;
+ background:#075e39dd
+}
+
+.brake{
+ right:108px;
+ width:72px;height:72px;
+ background:#7b2020dd
+}
+
+/* CAR */
+#car{
+ position:fixed;
+ z-index:18;
+ left:50%;
+ bottom:19%;
+ transform:translateX(-50%);
+ width:78px;
+ height:142px;
+ pointer-events:none;
+ filter:drop-shadow(0 12px 8px #000b)
+}
+
+.body{
+ position:absolute;
+ inset:8px 10px;
+ border-radius:28px 28px 20px 20px;
+ background:linear-gradient(
+ 90deg,#b58b00,#ffe04c 42%,#c59a00
+ );
+ border:2px solid #ffe98b
+}
+
+.glass{
+ position:absolute;
+ left:20px;right:20px;
+ top:28px;height:43px;
+ background:#10283ad9;
+ border-radius:14px 14px 8px 8px;
+ border:2px solid #8ed8ff55
+}
+
+.rear{
+ position:absolute;
+ left:19px;right:19px;
+ bottom:25px;height:27px;
+ background:#111;border-radius:5px
+}
+
+.wheel{
+ position:absolute;
+ width:12px;height:30px;
+ background:#090909;
+ border-radius:5px
+}
+
+.w1{left:2px;top:27px}
+.w2{right:2px;top:27px}
+.w3{left:2px;bottom:23px}
+.w4{right:2px;bottom:23px}
+
+#loading{
+ position:fixed;z-index:50;inset:0;
+ display:grid;place-items:center;
+ background:#06111a;color:white;
+ font-weight:800
+}
+
+#credit{
+ position:fixed;
+ z-index:19;
+ left:50%;bottom:5px;
+ transform:translateX(-50%);
+ font-size:9px;color:#fff9;
+ text-shadow:0 1px 3px #000;
+ white-space:nowrap
+}
+
+@media(max-width:650px){
+ #gps{top:140px;width:55vw}
+ #hud{top:72px}
+ .pad{width:64px;height:64px}
+ .gas{width:74px;height:74px}
+ .right{left:88px}
+ .brake{right:98px}
+ #car{
+   transform:translateX(-50%) scale(.82);
+   bottom:17%
+ }
+}
 </style>
 </head>
+
 <body>
+
 <div id="map"></div>
-<div id="loading">Loading World Drive 3D…</div>
-<div id="top" class="glass">
-<input id="q" value="Yas Marina Circuit" placeholder="Search any real place">
-<button onclick="findPlace()">FIND</button><button onclick="makeRoute()">GPS</button>
+
+<div id="loading">Loading real Earth 3D…</div>
+
+<div id="search" class="panel">
+ <input id="q" placeholder="Search any real place or address…">
+ <button id="go">GO</button>
+ <button id="me">⌖</button>
 </div>
-<div id="hud" class="glass"><b>WORLD DRIVE 3D</b><br><span id="speed">0</span> km/h<br><small>Satellite • 3D • GPS</small></div>
-<div id="gps" class="glass"><b>GPS NAVIGATION</b><div><span id="arrow">↑</span> <span id="instruction">Search a destination</span></div><small id="routeInfo"></small></div>
-<div id="badge" class="glass">BMW M4 • Abu Dhabi start</div>
-<div id="carWrap"><div class="car"><i class="wheel w1"></i><i class="wheel w2"></i><i class="tail t1"></i><i class="tail t2"></i></div></div>
-<div id="controls"><div class="cluster"><div class="ctrl" data-k="l">◀</div><div class="ctrl" data-k="r">▶</div></div><div class="cluster"><div class="ctrl brake" data-k="b">▼</div><div class="ctrl gas" data-k="g">▲</div></div></div>
-<div id="toast" class="glass"></div>
 
-<script src="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.js"></script>
-<script>
-const START={lng:54.3773,lat:24.4539};
-let pos={...START},bearing=0,speed=0,dest=null,route=null,steps=[],keys={},last=performance.now();
+<div id="hud" class="panel">
+ <div id="speed">0</div>
+ <div class="small">km/h</div>
+ <div id="road" class="small">Abu Dhabi</div>
+</div>
 
-const satelliteStyle={
+<div id="gps" class="panel">
+ <div id="turn">Search a destination</div>
+ <div id="distance" class="small">
+   Real-road GPS routing
+ </div>
+ <div id="status">
+   Terrain + buildings + satellite
+ </div>
+</div>
+
+<div id="car">
+ <div class="body"></div>
+ <div class="glass"></div>
+ <div class="rear"></div>
+ <i class="wheel w1"></i>
+ <i class="wheel w2"></i>
+ <i class="wheel w3"></i>
+ <i class="wheel w4"></i>
+</div>
+
+<button class="ctrl pad left" data-key="left">◀</button>
+<button class="ctrl pad right" data-key="right">▶</button>
+<button class="ctrl pad brake" data-key="brake">BRAKE</button>
+<button class="ctrl pad gas" data-key="gas">GAS</button>
+
+<div id="credit">
+ Map © OpenStreetMap contributors · Satellite © Esri
+</div>
+
+<script type="module">
+
+import * as maplibregl
+from 'https://unpkg.com/maplibre-gl@6.10.0/dist/maplibre-gl.mjs';
+
+const start={
+ lng:54.3773,
+ lat:24.4539
+};
+
+let pos={...start};
+let heading=35;
+let speed=0;
+
+let route=[];
+let routeIndex=0;
+let routeData=null;
+
+let last=performance.now();
+
+const keys={
+ left:false,
+ right:false,
+ gas:false,
+ brake:false
+};
+
+const style={
  version:8,
+
  sources:{
-  satellite:{type:"raster",tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],tileSize:256,attribution:"Tiles © Esri"},
-  osm:{type:"vector",url:"https://tiles.openfreemap.org/planet"}
+
+  sat:{
+   type:'raster',
+   tiles:[
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+   ],
+   tileSize:256,
+   attribution:'Tiles © Esri'
+  },
+
+  vector:{
+   type:'vector',
+   url:'https://tiles.openfreemap.org/planet'
+  },
+
+  terrain:{
+   type:'raster-dem',
+   url:'https://demotiles.maplibre.org/terrain-tiles/tiles.json',
+   tileSize:256
+  }
  },
+
  layers:[
-  {id:"satellite",type:"raster",source:"satellite"},
-  {id:"buildings",type:"fill-extrusion",source:"osm","source-layer":"building",minzoom:14,
+
+  {
+   id:'sat',
+   type:'raster',
+   source:'sat',
+
    paint:{
-    "fill-extrusion-color":["interpolate",["linear"],["coalesce",["get","render_height"],["get","height"],8],0,"#b8b5ad",70,"#d0cdc5",220,"#dce5ea"],
-    "fill-extrusion-height":["coalesce",["get","render_height"],["get","height"],8],
-    "fill-extrusion-base":["coalesce",["get","render_min_height"],0],
-    "fill-extrusion-opacity":0.82
-   }}
- ]
+    'raster-saturation':-.05,
+    'raster-contrast':.08
+   }
+  },
+
+  {
+   id:'buildings',
+   type:'fill-extrusion',
+   source:'vector',
+   'source-layer':'building',
+   minzoom:14,
+
+   paint:{
+
+    'fill-extrusion-color':[
+     'interpolate',
+     ['linear'],
+     ['coalesce',
+      ['get','render_height'],
+      ['get','height'],
+      8
+     ],
+
+     0,'#b8b5aa',
+     40,'#d8d2c5',
+     160,'#eee8dc'
+    ],
+
+    'fill-extrusion-height':[
+     'coalesce',
+     ['get','render_height'],
+     ['get','height'],
+     8
+    ],
+
+    'fill-extrusion-base':[
+     'coalesce',
+     ['get','render_min_height'],
+     ['get','min_height'],
+     0
+    ],
+
+    'fill-extrusion-opacity':.9
+   }
+  }
+ ],
+
+ terrain:{
+  source:'terrain',
+  exaggeration:1.15
+ }
 };
 
 const map=new maplibregl.Map({
- container:"map",style:satelliteStyle,center:[pos.lng,pos.lat],zoom:17.6,pitch:73,bearing:0,
- maxPitch:85,attributionControl:true,canvasContextAttributes:{antialias:true}
+
+ container:'map',
+
+ style:style,
+
+ center:[
+  pos.lng,
+  pos.lat
+ ],
+
+ zoom:17.5,
+
+ pitch:72,
+
+ bearing:heading,
+
+ canvasContextAttributes:{
+  antialias:true
+ },
+
+ maxPitch:85
 });
-map.addControl(new maplibregl.NavigationControl({showCompass:true}),"bottom-right");
-map.on("load",()=>{document.getElementById("loading").style.display="none";});
-map.on("error",e=>{console.warn(e.error||e);document.getElementById("loading").style.display="none";});
 
-function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.opacity=1;setTimeout(()=>e.style.opacity=0,2200)}
-function esc(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+map.on('load',()=>{
 
-async function findPlace(){
- const q=document.getElementById("q").value.trim();if(!q)return;
- try{
-  const r=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q="+encodeURIComponent(q),{headers:{Accept:"application/json"}});
-  const a=await r.json();if(!a.length){toast("Place not found");return}
-  dest={lng:+a[0].lon,lat:+a[0].lat,name:a[0].display_name};
-  new maplibregl.Popup().setLngLat([dest.lng,dest.lat]).setHTML("<b>"+esc(q)+"</b>").addTo(map);
-  map.flyTo({center:[dest.lng,dest.lat],zoom:17.5,pitch:70,duration:1500});
-  toast("Destination found");
-  setTimeout(()=>map.flyTo({center:[pos.lng,pos.lat],zoom:17.6,pitch:73,bearing:-bearing,duration:1000}),1800);
- }catch(e){toast("Search service unavailable")}
-}
-async function makeRoute(){
- if(!dest){await findPlace();if(!dest)return}
- try{
-  const u=`https://router.project-osrm.org/route/v1/driving/${pos.lng},${pos.lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson&steps=true`;
-  const j=await (await fetch(u)).json();if(!j.routes?.length){toast("No driving route found");return}
-  route=j.routes[0];steps=route.legs?.[0]?.steps||[];
-  const data={type:"Feature",properties:{},geometry:route.geometry};
-  if(map.getSource("route"))map.getSource("route").setData(data);
-  else{
-   map.addSource("route",{type:"geojson",data});
-   map.addLayer({id:"routeGlow",type:"line",source:"route",paint:{"line-color":"#003c64","line-width":12,"line-opacity":.7}});
-   map.addLayer({id:"routeLine",type:"line",source:"route",paint:{"line-color":"#19c8ff","line-width":6,"line-opacity":1}});
+ document.getElementById('loading').style.display='none';
+
+ map.addSource('route',{
+
+  type:'geojson',
+
+  data:{
+   type:'Feature',
+
+   geometry:{
+    type:'LineString',
+    coordinates:[]
+   }
   }
-  updateNav();toast("GPS route ready");
- }catch(e){toast("Routing service unavailable")}
-}
-function hav(a,b){const R=6371000,p1=a.lat*Math.PI/180,p2=b.lat*Math.PI/180,dp=(b.lat-a.lat)*Math.PI/180,dl=(b.lng-a.lng)*Math.PI/180,x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
-function updateNav(){
- if(!route||!dest)return;
- let best=null,bd=Infinity;
- for(const s of steps){if(!s.maneuver?.location)continue;const d=hav(pos,{lng:s.maneuver.location[0],lat:s.maneuver.location[1]});if(d<bd){bd=d;best=s}}
- if(best){
-  const mod=best.maneuver.modifier||"straight";
-  const icons={left:"←",right:"→","slight left":"↖","slight right":"↗","sharp left":"↙","sharp right":"↘",straight:"↑","u-turn":"↩"};
-  document.getElementById("arrow").textContent=icons[mod]||"↑";
-  document.getElementById("instruction").textContent=(best.maneuver.type||"continue")+" "+mod;
-  document.getElementById("routeInfo").textContent=Math.round(bd)+" m • "+(hav(pos,dest)/1000).toFixed(1)+" km remaining";
- }
-}
-document.querySelectorAll("[data-k]").forEach(el=>{
- const k=el.dataset.k;
- el.addEventListener("pointerdown",e=>{e.preventDefault();keys[k]=1;el.setPointerCapture?.(e.pointerId)});
- ["pointerup","pointercancel","pointerleave"].forEach(n=>el.addEventListener(n,()=>keys[k]=0));
-});
-addEventListener("keydown",e=>{if(["w","ArrowUp"].includes(e.key))keys.g=1;if(["s","ArrowDown"].includes(e.key))keys.b=1;if(["a","ArrowLeft"].includes(e.key))keys.l=1;if(["d","ArrowRight"].includes(e.key))keys.r=1});
-addEventListener("keyup",e=>{if(["w","ArrowUp"].includes(e.key))keys.g=0;if(["s","ArrowDown"].includes(e.key))keys.b=0;if(["a","ArrowLeft"].includes(e.key))keys.l=0;if(["d","ArrowRight"].includes(e.key))keys.r=0});
+ });
 
-function frame(now){
- requestAnimationFrame(frame);
- const dt=Math.min(.04,(now-last)/1000);last=now;
- if(keys.g)speed=Math.min(220,speed+55*dt);else speed*=Math.pow(.978,dt*60);
- if(keys.b)speed=Math.max(-35,speed-85*dt);
- if(Math.abs(speed)>1){
-  const steer=75*dt*Math.min(1,Math.abs(speed)/35);
-  if(keys.l)bearing-=steer*Math.sign(speed);
-  if(keys.r)bearing+=steer*Math.sign(speed);
- }
- const meters=speed/3.6*dt,rad=bearing*Math.PI/180;
- pos.lat+=Math.cos(rad)*meters/111320;
- pos.lng+=Math.sin(rad)*meters/(111320*Math.cos(pos.lat*Math.PI/180));
- map.jumpTo({center:[pos.lng,pos.lat],bearing:-bearing,pitch:73,zoom:17.6});
- document.getElementById("speed").textContent=Math.round(Math.abs(speed));
- if(route&&Math.floor(now/1000)!==Math.floor((now-dt*1000)/1000))updateNav();
+ map.addLayer({
+
+  id:'routeGlow',
+
+  type:'line',
+
+  source:'route',
+
+  paint:{
+   'line-color':'#031d2d',
+   'line-width':10,
+   'line-opacity':.75
+  }
+ });
+
+ map.addLayer({
+
+  id:'routeLine',
+
+  type:'line',
+
+  source:'route',
+
+  paint:{
+   'line-color':'#24c9ff',
+   'line-width':5,
+   'line-opacity':.95
+  }
+ });
+
+});
+
+function rad(x){
+ return x*Math.PI/180;
 }
+
+function deg(x){
+ return x*180/Math.PI;
+}
+
+function dist(a,b){
+
+ const R=6371000;
+
+ const p1=rad(a.lat);
+ const p2=rad(b.lat);
+
+ const dp=rad(b.lat-a.lat);
+ const dl=rad(b.lng-a.lng);
+
+ const h=
+ Math.sin(dp/2)**2+
+ Math.cos(p1)*
+ Math.cos(p2)*
+ Math.sin(dl/2)**2;
+
+ return 2*R*Math.asin(Math.sqrt(h));
+}
+
+function bearing(a,b){
+
+ const y=
+ Math.sin(rad(b.lng-a.lng))*
+ Math.cos(rad(b.lat));
+
+ const x=
+ Math.cos(rad(a.lat))*
+ Math.sin(rad(b.lat))-
+ Math.sin(rad(a.lat))*
+ Math.cos(rad(b.lat))*
+ Math.cos(rad(b.lng-a.lng));
+
+ return(
+  deg(Math.atan2(y,x))+360
+ )%360;
+}
+
+function move(p,brg,m){
+
+ const R=6378137;
+
+ const d=m/R;
+
+ const b=rad(brg);
+
+ const p1=rad(p.lat);
+
+ const l1=rad(p.lng);
+
+ const p2=Math.asin(
+  Math.sin(p1)*Math.cos(d)+
+  Math.cos(p1)*
+  Math.sin(d)*
+  Math.cos(b)
+ );
+
+ const l2=
+ l1+
+ Math.atan2(
+  Math.sin(b)*
+  Math.sin(d)*
+  Math.cos(p1),
+
+  Math.cos(d)-
+  Math.sin(p1)*
+  Math.sin(p2)
+ );
+
+ return{
+  lat:deg(p2),
+  lng:deg(l2)
+ };
+}
+
+async function search(){
+
+ const q=
+ document.getElementById('q')
+ .value.trim();
+
+ if(!q)return;
+
+ setStatus('Finding place…');
+
+ try{
+
+  const r=await fetch(
+   'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q='+
+   encodeURIComponent(q),
+   {
+    headers:{
+     'Accept-Language':'en'
+    }
+   }
+  );
+
+  const j=await r.json();
+
+  if(!j.length)throw 0;
+
+  const dest={
+   lng:+j[0].lon,
+   lat:+j[0].lat
+  };
+
+  await routeTo(
+   dest,
+   j[0].display_name
+  );
+
+ }
+ catch(e){
+
+  setStatus(
+   'Place not found. Try a more specific address.'
+  );
+
+ }
+}
+
+async function routeTo(dest,name){
+
+ setStatus(
+  'Calculating real-road route…'
+ );
+
+ try{
+
+  const u=
+  `https://router.project-osrm.org/route/v1/driving/${pos.lng},${pos.lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson&steps=true`;
+
+  const r=await fetch(u);
+
+  const j=await r.json();
+
+  if(!j.routes?.length)
+   throw 0;
+
+  route=
+  j.routes[0]
+  .geometry
+  .coordinates
+  .map(c=>({
+   lng:c[0],
+   lat:c[1]
+  }));
+
+  routeData=j.routes[0];
+
+  routeIndex=0;
+
+  map.getSource('route').setData({
+
+   type:'Feature',
+
+   geometry:{
+    type:'LineString',
+    coordinates:
+    j.routes[0]
+    .geometry
+    .coordinates
+   }
+
+  });
+
+  document
+  .getElementById('turn')
+  .textContent=
+  'Route ready — drive!';
+
+  document
+  .getElementById('distance')
+  .textContent=
+  (j.routes[0].distance/1000)
+  .toFixed(1)
+  +' km · '+
+  Math.round(
+   j.routes[0].duration/60
+  )
+  +' min';
+
+  document
+  .getElementById('road')
+  .textContent=
+  name.split(',')[0];
+
+  setStatus('GPS active');
+
+ }
+ catch(e){
+
+  setStatus(
+   'Routing service unavailable. Try again.'
+  );
+
+ }
+}
+
+function setStatus(s){
+
+ document
+ .getElementById('status')
+ .textContent=s;
+
+}
+
+function gpsUpdate(){
+
+ if(!route.length)return;
+
+ let best=routeIndex;
+
+ let bestD=1e9;
+
+ for(
+  let i=Math.max(0,routeIndex-8);
+  i<Math.min(
+   route.length,
+   routeIndex+35
+  );
+  i++
+ ){
+
+  let d=dist(
+   pos,
+   route[i]
+  );
+
+  if(d<bestD){
+
+   bestD=d;
+
+   best=i;
+
+  }
+ }
+
+ routeIndex=best;
+
+ const target=
+ route[
+  Math.min(
+   route.length-1,
+   routeIndex+8
+  )
+ ];
+
+ const dleft=
+ route
+ .slice(routeIndex)
+ .reduce(
+  (s,p,i,a)=>
+  i?s+dist(a[i-1],p):s,
+  0
+ );
+
+ document
+ .getElementById('distance')
+ .textContent=
+ dleft<1000
+ ?
+ Math.round(dleft)+' m remaining'
+ :
+ (dleft/1000).toFixed(1)+
+ ' km remaining';
+
+ const delta=
+ (
+  (
+   bearing(pos,target)-
+   heading+
+   540
+  )%360
+ )-180;
+
+ document
+ .getElementById('turn')
+ .textContent=
+ Math.abs(delta)<15
+ ?
+ '↑ Continue'
+ :
+ delta>0
+ ?
+ '↗ Turn right ahead'
+ :
+ '↖ Turn left ahead';
+
+ if(dleft<25){
+
+  document
+  .getElementById('turn')
+  .textContent=
+  '✓ Destination reached';
+
+  speed=0;
+
+ }
+}
+
+function frame(t){
+
+ const dt=
+ Math.min(
+  .05,
+  (t-last)/1000
+ );
+
+ last=t;
+
+ if(keys.gas)
+  speed+=25*dt;
+
+ if(keys.brake)
+  speed-=45*dt;
+
+ speed-=3.2*dt;
+
+ speed=
+ Math.max(
+  0,
+  Math.min(
+   145,
+   speed
+  )
+ );
+
+ const steer=
+ (keys.left?-1:0)+
+ (keys.right?1:0);
+
+ heading=
+ (
+  heading+
+  steer*
+  (25+speed*.45)*
+  dt+
+  360
+ )%360;
+
+ pos=
+ move(
+  pos,
+  heading,
+  (speed/3.6)*dt
+ );
+
+ document
+ .getElementById('speed')
+ .textContent=
+ Math.round(speed);
+
+ gpsUpdate();
+
+ map.jumpTo({
+
+  center:[
+   pos.lng,
+   pos.lat
+  ],
+
+  bearing:heading,
+
+  pitch:72,
+
+  zoom:17.6
+
+ });
+
+ requestAnimationFrame(frame);
+}
+
 requestAnimationFrame(frame);
+
+document
+.getElementById('go')
+.onclick=search;
+
+document
+.getElementById('q')
+.addEventListener(
+ 'keydown',
+ e=>{
+  if(e.key==='Enter')
+   search();
+ }
+);
+
+document
+.getElementById('me')
+.onclick=()=>{
+
+ if(navigator.geolocation)
+
+ navigator.geolocation
+ .getCurrentPosition(
+
+  p=>{
+
+   pos={
+    lng:p.coords.longitude,
+    lat:p.coords.latitude
+   };
+
+   map.jumpTo({
+    center:[
+     pos.lng,
+     pos.lat
+    ]
+   });
+
+   setStatus(
+    'Moved to your location'
+   );
+
+  },
+
+  ()=>setStatus(
+   'Location permission not available'
+  )
+
+ );
+
+};
+
+for(
+ const el of
+ document.querySelectorAll(
+  '[data-key]'
+ )
+){
+
+ const k=el.dataset.key;
+
+ for(
+  const ev of
+  ['pointerdown','touchstart']
+ ){
+
+  el.addEventListener(
+   ev,
+   e=>{
+    e.preventDefault();
+    keys[k]=true;
+   },
+   {passive:false}
+  );
+
+ }
+
+ for(
+  const ev of
+  [
+   'pointerup',
+   'pointercancel',
+   'pointerleave',
+   'touchend'
+  ]
+ ){
+
+  el.addEventListener(
+   ev,
+   e=>{
+    e.preventDefault();
+    keys[k]=false;
+   },
+   {passive:false}
+  );
+
+ }
+}
+
+addEventListener(
+ 'keydown',
+ e=>{
+
+  if(
+   e.key==='ArrowLeft'||
+   e.key==='a'
+  )
+   keys.left=true;
+
+  if(
+   e.key==='ArrowRight'||
+   e.key==='d'
+  )
+   keys.right=true;
+
+  if(
+   e.key==='ArrowUp'||
+   e.key==='w'
+  )
+   keys.gas=true;
+
+  if(
+   e.key==='ArrowDown'||
+   e.key==='s'
+  )
+   keys.brake=true;
+
+ }
+);
+
+addEventListener(
+ 'keyup',
+ e=>{
+
+  if(
+   e.key==='ArrowLeft'||
+   e.key==='a'
+  )
+   keys.left=false;
+
+  if(
+   e.key==='ArrowRight'||
+   e.key==='d'
+  )
+   keys.right=false;
+
+  if(
+   e.key==='ArrowUp'||
+   e.key==='w'
+  )
+   keys.gas=false;
+
+  if(
+   e.key==='ArrowDown'||
+   e.key==='s'
+  )
+   keys.brake=false;
+
+ }
+);
+
 </script>
+
 </body>
-</html>
+ </html>
