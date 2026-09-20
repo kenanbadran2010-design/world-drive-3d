@@ -2,12 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
-<title>World Drive 3D — Ultimate</title>
+<title>World Drive 3D — Cesium Edition</title>
+
+<script>
+window.CESIUM_BASE_URL =
+"https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/";
+</script>
 
 <link rel="stylesheet"
-href="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.css">
+href="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Widgets/widgets.css">
+
+<script
+src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js">
+</script>
 
 <style>
 
@@ -16,401 +25,426 @@ box-sizing:border-box;
 -webkit-tap-highlight-color:transparent
 }
 
-html,body,#map{
+html,body,#world{
 margin:0;
 width:100%;
 height:100%;
 overflow:hidden;
-background:#071018;
-font-family:Inter,system-ui,sans-serif;
+background:#05080d;
+font-family:system-ui,sans-serif;
 touch-action:none
 }
 
-#map{
-position:fixed;
-inset:0
+.cesium-viewer-toolbar,
+.cesium-viewer-animationContainer,
+.cesium-viewer-timelineContainer,
+.cesium-viewer-fullscreenContainer{
+display:none!important
 }
 
 .glass{
-background:#07131de8;
+background:#07111de8;
 color:#fff;
 border:1px solid #ffffff35;
-backdrop-filter:blur(12px);
-box-shadow:0 8px 30px #0009
+backdrop-filter:blur(10px);
+box-shadow:0 7px 25px #0008
 }
 
-/* SEARCH */
-
-#top{
+#search{
 position:fixed;
-z-index:30;
-top:max(8px,env(safe-area-inset-top));
+z-index:20;
 left:50%;
+top:max(8px,env(safe-area-inset-top));
 transform:translateX(-50%);
-width:min(760px,94vw);
+width:min(720px,94vw);
+padding:6px;
+border-radius:14px;
 display:flex;
-gap:6px;
-padding:7px;
-border-radius:15px
+gap:6px
 }
 
 #q{
 flex:1;
 min-width:0;
 border:0;
-border-radius:10px;
-padding:12px;
+border-radius:9px;
+padding:11px;
 font-size:15px
 }
 
 button{
 border:0;
-border-radius:10px;
-background:#0878b9;
-color:#fff;
-padding:10px 12px;
-font-weight:850
+border-radius:9px;
+background:#147bb6;
+color:white;
+font-weight:900;
+padding:9px 11px
 }
 
-/* SPEED */
-
-#hud{
+#dash{
 position:fixed;
-z-index:25;
+z-index:20;
 left:10px;
-top:74px;
-padding:10px 14px;
+top:70px;
+padding:9px 13px;
 border-radius:14px;
-min-width:110px
+min-width:115px
 }
 
 #speed{
-font-size:36px;
-font-weight:950;
+font-size:38px;
+font-weight:1000;
 line-height:1
 }
 
-.tiny{
-font-size:11px;
-opacity:.78
-}
-
-/* GPS */
+small{opacity:.72}
 
 #nav{
 position:fixed;
-z-index:25;
+z-index:20;
 right:10px;
-top:74px;
-width:min(300px,54vw);
-padding:11px;
+top:70px;
+width:min(330px,57vw);
+padding:10px;
 border-radius:14px
 }
 
-#maneuver{
-font-size:20px;
-font-weight:900;
-line-height:1.15
+#turn{
+font-size:17px;
+font-weight:950
 }
 
-#nextdist{
-font-size:15px;
-font-weight:800;
+#distance{
+font-size:13px;
 margin-top:4px
 }
 
-#eta{
-margin-top:5px
-}
-
-#mode{
+#status{
 position:fixed;
-z-index:24;
+z-index:21;
 left:10px;
-top:177px;
-padding:7px 10px;
-border-radius:11px;
-font-size:11px
+top:167px;
+padding:6px 9px;
+border-radius:9px;
+font-size:10px
 }
 
-/* CAR */
-
-#car{
+#wheel{
 position:fixed;
-z-index:19;
-left:50%;
-bottom:17%;
-transform:translateX(-50%);
-width:88px;
-height:154px;
-pointer-events:none;
-filter:drop-shadow(0 15px 8px #000b);
-perspective:400px
-}
-
-.carbody{
-position:absolute;
-inset:7px 10px;
-border-radius:33px 33px 20px 20px;
-
-background:
-linear-gradient(
-90deg,
-#8e6800,
-#ffe85a 35%,
-#d2a900 67%,
-#765400
-);
-
-border:2px solid #fff09a;
-transform:rotateX(8deg)
-}
-
-.wind{
-position:absolute;
-left:21px;
-right:21px;
-top:29px;
-height:43px;
-
-background:
-linear-gradient(
-#183b50,
-#08151e
-);
-
-border-radius:15px 15px 7px 7px;
-border:2px solid #8ed8ff55
-}
-
-.rear{
-position:absolute;
+z-index:30;
 left:18px;
-right:18px;
-bottom:25px;
-height:25px;
-background:#161616;
-border-radius:5px
-}
-
-.lamp{
-position:absolute;
-bottom:31px;
-width:19px;
-height:7px;
-background:#e62929;
-box-shadow:0 0 9px #f22
-}
-
-.l1{left:15px}
-.l2{right:15px}
-
-/* STEERING WHEEL */
-
-#wheelCtl{
-position:fixed;
-z-index:35;
-left:18px;
-bottom:max(20px,env(safe-area-inset-bottom));
-
-width:150px;
-height:150px;
-
+bottom:max(18px,env(safe-area-inset-bottom));
+width:140px;
+height:140px;
+border:13px solid #151515;
 border-radius:50%;
-
 background:
-radial-gradient(
-circle,
-#222 0 20%,
-transparent 21%
-),
-
+radial-gradient(circle,#333 0 19%,transparent 20%),
 conic-gradient(
 #111 0 12%,
-#555 12% 17%,
-#111 17% 45%,
-#555 45% 50%,
-#111 50% 78%,
-#555 78% 83%,
-#111 83%
-);
-
-border:12px solid #111;
-
+#777 12% 16%,
+#111 16% 46%,
+#777 46% 50%,
+#111 50% 80%,
+#777 80% 84%,
+#111 84%);
 box-shadow:
-0 8px 25px #000b,
+0 10px 24px #000c,
 inset 0 0 0 3px #777;
-
 touch-action:none
 }
 
-#wheelCtl:after{
+#wheel:after{
 content:"";
 position:absolute;
 left:50%;
 top:50%;
-width:16px;
-height:58px;
-background:#333;
-transform:translate(-50%,-50%);
-border-radius:8px
+width:18px;
+height:70px;
+background:#222;
+border-radius:8px;
+transform:translate(-50%,-50%)
 }
-
-/* PEDALS */
 
 #pedals{
 position:fixed;
-z-index:35;
+z-index:30;
 right:18px;
-bottom:max(20px,env(safe-area-inset-bottom));
-
+bottom:max(18px,env(safe-area-inset-bottom));
 display:flex;
-gap:14px;
+gap:13px;
 align-items:flex-end
 }
 
 .pedal{
-touch-action:none;
-color:#ddd;
-
-background:
-linear-gradient(
-#666,
-#222
-);
-
-border:2px solid #888;
-border-radius:9px 9px 16px 16px;
-
+background:linear-gradient(#777,#252525);
+border:2px solid #999;
 box-shadow:
-0 9px 18px #000a,
+0 8px 17px #000b,
 inset 0 0 0 3px #333;
+color:#eee;
+touch-action:none
+}
 
-font-weight:900;
-letter-spacing:.5px
+.pedal.on{
+transform:translateY(8px);
+filter:brightness(.7)
 }
 
 #brake{
-width:66px;
+width:67px;
 height:102px
 }
 
 #gas{
 width:58px;
-height:128px
+height:130px
 }
 
-.pedal.on{
-transform:translateY(8px);
-filter:brightness(.75)
+#handbrake{
+position:fixed;
+z-index:30;
+right:18px;
+bottom:164px;
+background:#8d2929
 }
-
-/* GEAR */
 
 #gear{
 position:fixed;
 z-index:30;
 left:50%;
-bottom:12px;
-
+bottom:9px;
 transform:translateX(-50%);
-
-padding:6px 10px;
-border-radius:10px;
-
-color:#fff;
-font-weight:900;
-background:#07131ddd
+padding:6px 12px;
+border-radius:9px;
+font-size:17px;
+font-weight:1000
 }
 
-/* WEATHER */
-
-#weather{
+#setup{
 position:fixed;
-z-index:21;
+z-index:100;
 inset:0;
-pointer-events:none;
-opacity:0;
-
-transition:.4s;
-
-background:
-repeating-linear-gradient(
-105deg,
-transparent 0 16px,
-#b9e9ff55 17px 18px,
-transparent 19px 30px
-)
+background:#03070bd9;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px
 }
 
-#shade{
-position:fixed;
-z-index:20;
-inset:0;
-pointer-events:none;
-transition:.5s;
-background:transparent
+#setupCard{
+max-width:560px;
+padding:22px;
+border-radius:18px;
+color:white
 }
 
-/* MESSAGE */
+#token{
+width:100%;
+padding:12px;
+border-radius:9px;
+border:1px solid #ffffff44;
+margin:10px 0
+}
+
+#setupCard h2{
+margin-top:0
+}
+
+#setupCard p{
+line-height:1.35;
+color:#d9e7f3
+}
+
+#skip{
+background:#38434b
+}
 
 #toast{
 position:fixed;
 z-index:50;
+top:132px;
 left:50%;
-top:135px;
 transform:translateX(-50%);
-
 padding:8px 12px;
 border-radius:10px;
-
-color:#fff;
 display:none
 }
 
-#credit{
+#progressWrap{
 position:fixed;
-z-index:23;
-
+z-index:22;
 left:50%;
-bottom:2px;
-
+top:58px;
 transform:translateX(-50%);
+width:min(420px,58vw);
+height:5px;
+background:#ffffff2b;
+border-radius:10px;
+overflow:hidden
+}
 
-font-size:8px;
-color:#fffb;
-text-shadow:0 1px 3px #000;
-white-space:nowrap
+#progress{
+height:100%;
+width:0;
+background:#23d8ff
+}
+
+#assist{
+position:fixed;
+z-index:30;
+right:252px;
+bottom:164px;
+background:#24643c
+}
+
+#assist.off{
+background:#555
+}
+
+#brakeGlow{
+position:fixed;
+z-index:18;
+left:50%;
+bottom:14.5%;
+transform:translateX(-50%);
+width:66px;
+height:10px;
+border-radius:50%;
+background:#ff1d1d;
+filter:blur(7px);
+opacity:0;
+pointer-events:none
+}
+
+#driveMode{
+position:fixed;
+z-index:30;
+left:50%;
+bottom:48px;
+transform:translateX(-50%);
+padding:7px 11px;
+border-radius:10px;
+font-size:11px
+}
+
+#miniNav{
+position:fixed;
+z-index:19;
+right:10px;
+top:202px;
+width:150px;
+height:92px;
+border-radius:13px;
+overflow:hidden;
+pointer-events:none
+}
+
+#miniRoad{
+position:absolute;
+left:72px;
+top:-25px;
+width:7px;
+height:150px;
+background:#21d8ff;
+box-shadow:0 0 9px #21d8ff;
+transform-origin:50% 75%
+}
+
+#miniCar{
+position:absolute;
+left:68px;
+bottom:10px;
+width:15px;
+height:26px;
+border-radius:6px;
+background:#f4c400;
+border:1px solid white
+}
+
+#quality{
+position:fixed;
+z-index:30;
+left:10px;
+top:200px;
+background:#35485c
+}
+
+#reset{
+position:fixed;
+z-index:30;
+left:82px;
+top:200px;
+background:#6a3d24
+}
+
+#fps{
+position:fixed;
+z-index:20;
+left:10px;
+top:241px;
+padding:5px 8px;
+border-radius:8px;
+font-size:10px
 }
 
 @media(max-width:650px){
 
+#wheel{
+width:122px;
+height:122px;
+border-width:11px
+}
+
+#pedals{
+right:10px
+}
+
 #nav{
-top:132px;
-width:58vw
+top:125px
 }
 
-#mode{
-top:178px
+#status{
+top:166px
 }
 
-#wheelCtl{
-width:125px;
-height:125px;
-border-width:10px
+#assist{
+right:auto;
+left:155px;
+bottom:20px;
+font-size:10px;
+padding:8px
 }
 
-.pedal{
-transform:scale(.9);
-transform-origin:bottom right
+#camera{
+right:98px!important;
+bottom:160px!important
 }
 
-#car{
-transform:
-translateX(-50%)
-scale(.8);
+#lights{
+right:18px!important;
+bottom:160px!important
+}
 
-bottom:16%
+#miniNav{
+display:none
+}
+
+#quality{
+top:205px
+}
+
+#reset{
+top:205px
+}
+
+#fps{
+top:244px
+}
+
+#driveMode{
+bottom:4px;
+font-size:9px
 }
 
 }
@@ -420,93 +454,86 @@ bottom:16%
 
 <body>
 
-<div id="map"></div>
+<div id="world"></div>
 
-<div id="weather"></div>
-<div id="shade"></div>
-
-<!-- SEARCH -->
-
-<div id="top" class="glass">
+<div id="search" class="glass">
 
 <input
 id="q"
-placeholder="Search any real place or address">
+placeholder="Search any real place">
 
 <button id="go">
-ROUTE
+GPS
 </button>
 
 <button id="loc">
 ⌖
 </button>
 
-<button id="fx">
-☀
-</button>
-
 </div>
 
-<!-- SPEED -->
-
-<div id="hud" class="glass">
+<div id="dash" class="glass">
 
 <div id="speed">
 0
 </div>
 
-<div class="tiny">
+<small>
 km/h
+</small>
+
+<div id="road">
+<small>Abu Dhabi</small>
 </div>
 
-<div id="road" class="tiny">
-Abu Dhabi
 </div>
-
-</div>
-
-<!-- GPS -->
 
 <div id="nav" class="glass">
 
-<div id="maneuver">
-Search a destination
+<div id="turn">
+Search for a destination
 </div>
 
-<div id="nextdist">
-Real-road navigation
+<div id="distance">
+3D navigation ready
 </div>
 
-<div id="eta" class="tiny">
-GPS ready
-</div>
-
-</div>
-
-<div id="mode" class="glass">
-3D TERRAIN • SATELLITE • BUILDINGS
-</div>
-
-<!-- CAR -->
-
-<div id="car">
-
-<div class="carbody"></div>
-
-<div class="wind"></div>
-
-<div class="rear"></div>
-
-<i class="lamp l1"></i>
-<i class="lamp l2"></i>
+<small id="eta"></small>
 
 </div>
 
-<!-- STEERING -->
+<div id="progressWrap">
+<div id="progress"></div>
+</div>
 
-<div id="wheelCtl"></div>
+<div id="status" class="glass">
+CESIUM 3D • FREE MODE
+</div>
 
-<!-- PEDALS -->
+<div id="miniNav" class="glass">
+<div id="miniRoad"></div>
+<div id="miniCar"></div>
+</div>
+
+<button id="quality">
+QUALITY
+</button>
+
+<button id="reset">
+RESET
+</button>
+
+<div id="fps" class="glass">
+60 FPS
+</div>
+
+<div id="driveMode" class="glass">
+SPORT • ABS • TRACTION CONTROL
+</div>
+
+<div id="brakeGlow"></div>
+
+<div id="wheel"></div>
 
 <div id="pedals">
 
@@ -524,157 +551,2051 @@ GAS
 
 </div>
 
-<div id="gear">
-D
+<button id="handbrake">
+P
+</button>
+
+<button
+id="lights"
+style="
+position:fixed;
+z-index:30;
+right:92px;
+bottom:164px;
+background:#35485c">
+LIGHTS
+</button>
+
+<button
+id="camera"
+style="
+position:fixed;
+z-index:30;
+right:174px;
+bottom:164px;
+background:#35485c">
+CAM
+</button>
+
+<button id="assist">
+ROAD ASSIST
+</button>
+
+<div id="gear" class="glass">
+D1
 </div>
+
+<div id="toast" class="glass"></div>
+
+<div id="setup">
 
 <div
-id="toast"
+id="setupCard"
 class="glass">
+
+<h2>
+World Drive 3D
+</h2>
+
+<p>
+This is the Cesium 3D engine.
+For global terrain and 3D OSM buildings,
+paste your Cesium ion token.
+The token is stored only in this browser.
+You can also start the basic globe mode.
+</p>
+
+<input
+id="token"
+placeholder="Paste free Cesium ion token (optional)">
+
+<button id="start">
+START FULL 3D
+</button>
+
+<button id="skip">
+START BASIC
+</button>
+
+</div>
 </div>
 
-<div id="credit">
-© OpenStreetMap contributors · Satellite © Esri · routing by OSRM
-</div>
-
-<script type="module">
-
-import * as maplibregl
-from
-'https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.mjs';
-
+<script>
 
 const $ =
-id =>
-document.getElementById(id);
+x => document.getElementById(x);
 
+let viewer;
+let car;
+let carParts=[];
+let routeEntity;
+let destMarker;
 
-/* =========================
-   GAME STATE
-========================= */
-
-let pos = {
+let pos={
 lng:54.3773,
 lat:24.4539
 };
 
-let heading = 35;
+let heading=35;
+let speed=0;
 
-let speed = 0;
+let steer=0;
+let gas=0;
+let brake=0;
+let handbrake=0;
 
-let steer = 0;
+let reverse=false;
+let lightsOn=false;
 
-let throttle = 0;
+let cameraMode=0;
+let roadAssist=true;
 
-let braking = 0;
+let smoothedGas=0;
+let smoothedBrake=0;
 
-let route = [];
+let qualityMode=0;
 
-let steps = [];
+let lastSafe={
+lng:54.3773,
+lat:24.4539
+};
 
-let routeIndex = 0;
+let fpsFrames=0;
+let fpsStamp=performance.now();
 
-let last =
-performance.now();
+let route=[];
+let steps=[];
+let routeI=0;
 
-let lastReroute = 0;
+let destination=null;
+let destName="";
 
-let destination = null;
+let last=performance.now();
+let lastReroute=0;
 
-let destName = "";
+let cameraHeading=35;
 
-let fx = 0;
+const R=6378137;
+
+const rad=
+x=>x*Math.PI/180;
+
+const deg=
+x=>x*180/Math.PI;
 
 
-/* =========================
-   REAL WORLD MAP
-========================= */
+function dist(a,b){
 
-const style = {
+let p1=rad(a.lat);
+let p2=rad(b.lat);
 
-version:8,
+let dp=p2-p1;
+let dl=rad(b.lng-a.lng);
 
-sources:{
+let h=
+Math.sin(dp/2)**2+
+Math.cos(p1)*
+Math.cos(p2)*
+Math.sin(dl/2)**2;
 
-sat:{
-
-type:"raster",
-
-tiles:[
-
-"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-
-],
-
-tileSize:256,
-
-attribution:"© Esri"
-
-},
-
-vector:{
-
-type:"vector",
-
-url:
-"https://tiles.openfreemap.org/planet"
-
-},
-
-dem:{
-
-type:"raster-dem",
-
-url:
-"https://demotiles.maplibre.org/terrain-tiles/tiles.json",
-
-tileSize:256
+return 6371000*
+2*
+Math.asin(Math.sqrt(h));
 
 }
 
-},
 
-layers:[
+function move(p,b,m){
 
-{
+let d=m/R;
+let br=rad(b);
 
-id:"sat",
+let p1=rad(p.lat);
+let l1=rad(p.lng);
 
-type:"raster",
+let p2=
+Math.asin(
+Math.sin(p1)*Math.cos(d)+
+Math.cos(p1)*
+Math.sin(d)*
+Math.cos(br)
+);
 
-source:"sat",
+let l2=
+l1+
+Math.atan2(
+Math.sin(br)*
+Math.sin(d)*
+Math.cos(p1),
+Math.cos(d)-
+Math.sin(p1)*
+Math.sin(p2)
+);
 
-paint:{
-
-"raster-saturation":-.08,
-
-"raster-contrast":.1,
-
-"raster-brightness-min":.05
+return{
+lat:deg(p2),
+lng:deg(l2)
+};
 
 }
 
-},
 
+function toast(s){
+
+$("toast").textContent=s;
+$("toast").style.display="block";
+
+setTimeout(
+()=>$("toast").style.display="none",
+1700
+);
+
+}
+
+
+async function boot(full){
+
+$("setup").style.display="none";
+
+let token=
+$("token").value.trim()||
+localStorage.getItem("wd3d-ion")||
+"";
+
+if(token){
+
+Cesium.Ion.defaultAccessToken=token;
+
+localStorage.setItem(
+"wd3d-ion",
+token
+);
+
+}
+
+viewer=
+new Cesium.Viewer(
+"world",
 {
 
-id:"buildings",
+animation:false,
+timeline:false,
+baseLayerPicker:false,
+geocoder:false,
+homeButton:false,
+sceneModePicker:false,
+navigationHelpButton:false,
+fullscreenButton:false,
+selectionIndicator:false,
+infoBox:false,
+shouldAnimate:true
 
-type:"fill-extrusion",
+}
+);
 
-source:"vector",
+viewer.scene.globe.enableLighting=true;
 
-"source-layer":"building",
+viewer.scene.globe.depthTestAgainstTerrain=true;
 
-minzoom:14,
+viewer.scene.screenSpaceCameraController.enableInputs=false;
 
-paint:{
 
-"fill-extrusion-color":[
+if(full && token){
 
-"interpolate",
+try{
 
-["linear"],
+viewer.terrainProvider=
+await Cesium.createWorldTerrainAsync({
+requestVertexNormals:true
+});
+
+let buildings=
+await Cesium.createOsmBuildingsAsync();
+
+viewer.scene.primitives.add(buildings);
+
+$("status").textContent=
+"CESIUM 3D • TERRAIN • 3D BUILDINGS";
+
+}
+
+catch(e){
+
+toast(
+"3D assets unavailable — basic globe loaded"
+);
+
+}
+
+}
+
+
+const root=
+Cesium.Cartesian3.fromDegrees(
+pos.lng,
+pos.lat,
+2
+);
+
+
+car=
+viewer.entities.add({
+
+position:root,
+
+orientation:
+Cesium.Transforms.headingPitchRollQuaternion(
+root,
+new Cesium.HeadingPitchRoll(
+rad(heading),
+0,
+0
+)
+)
+
+});
+
+
+const addPart=
+(offset,dim,color)=>{
+
+let e=
+viewer.entities.add({
+
+position:root,
+
+orientation:car.orientation,
+
+box:{
+
+dimensions:
+new Cesium.Cartesian3(
+...dim
+),
+
+material:
+Cesium.Color.fromCssColorString(
+color
+),
+
+outline:false
+
+}
+
+});
+
+e._carOffset=offset;
+
+carParts.push(e);
+
+return e;
+
+};
+
+
+// CAR BODY
+
+addPart(
+[0,0,.45],
+[2.02,4.55,.72],
+"#f4c400"
+);
+
+addPart(
+[0,-.28,1.00],
+[1.72,2.15,.68],
+"#d7ad00"
+);
+
+addPart(
+[0,1.38,.78],
+[1.88,1.45,.38],
+"#f8d22b"
+);
+
+addPart(
+[0,-1.70,.68],
+[1.90,.42,.42],
+"#151515"
+);
+
+
+// GLASS
+
+addPart(
+[0,-.35,1.20],
+[1.55,1.38,.12],
+"#173344"
+);
+
+
+// WHEELS
 
 [
-"
+[-.92,1.35,.35],
+[.92,1.35,.35],
+[-.92,-1.35,.35],
+[.92,-1.35,.35]
+]
+.forEach(
+o=>
+addPart(
+o,
+[.28,.72,.72],
+"#111111"
+)
+);
+
+
+// TAIL LIGHTS
+
+addPart(
+[-.66,-2.02,.72],
+[.42,.10,.15],
+"#ff2020"
+);
+
+addPart(
+[.66,-2.02,.72],
+[.42,.10,.15],
+"#ff2020"
+);
+
+
+// HEADLIGHTS
+
+addPart(
+[-.62,2.05,.68],
+[.48,.10,.13],
+"#fff7d0"
+);
+
+addPart(
+[.62,2.05,.68],
+[.48,.10,.13],
+"#fff7d0"
+);
+
+
+// SPOILER
+
+addPart(
+[0,-2.16,.98],
+[1.48,.16,.08],
+"#222222"
+);
+
+
+// FRONT GRILLE
+
+addPart(
+[0,2.10,.53],
+[1.45,.13,.16],
+"#111111"
+);
+
+
+routeEntity=
+viewer.entities.add({
+
+polyline:{
+
+positions:[],
+
+width:9,
+
+material:
+new Cesium.PolylineGlowMaterialProperty({
+
+glowPower:.28,
+color:Cesium.Color.CYAN
+
+}),
+
+clampToGround:true
+
+}
+
+});
+
+
+requestAnimationFrame(loop);
+
+}
+
+
+$("start").onclick=
+()=>boot(true);
+
+$("skip").onclick=
+()=>boot(false);
+
+
+
+async function search(){
+
+let q=
+$("q").value.trim();
+
+if(!q)return;
+
+toast("Searching…");
+
+try{
+
+let r=
+await fetch(
+
+"https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q="+
+encodeURIComponent(q)
+
+);
+
+let j=
+await r.json();
+
+if(!j.length)
+throw 0;
+
+
+destination={
+
+lng:+j[0].lon,
+lat:+j[0].lat
+
+};
+
+destName=
+j[0].display_name;
+
+
+if(destMarker)
+viewer.entities.remove(destMarker);
+
+
+destMarker=
+viewer.entities.add({
+
+position:
+Cesium.Cartesian3.fromDegrees(
+destination.lng,
+destination.lat,
+3
+),
+
+point:{
+
+pixelSize:16,
+
+color:
+Cesium.Color.LIME,
+
+outlineColor:
+Cesium.Color.WHITE,
+
+outlineWidth:3
+
+},
+
+label:{
+
+text:"DESTINATION",
+
+font:"700 13px sans-serif",
+
+pixelOffset:
+new Cesium.Cartesian2(
+0,
+-25
+),
+
+fillColor:
+Cesium.Color.WHITE,
+
+showBackground:true,
+
+backgroundColor:
+new Cesium.Color(
+0,
+0,
+0,
+.65
+)
+
+}
+
+});
+
+
+await makeRoute(false);
+
+}
+
+catch(e){
+
+toast("Place not found");
+
+}
+
+}
+
+
+
+async function makeRoute(re=false){
+
+if(!destination)
+return;
+
+try{
+
+let u=
+
+`https://router.project-osrm.org/route/v1/driving/${pos.lng},${pos.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&steps=true`;
+
+
+let r=
+await fetch(u);
+
+let j=
+await r.json();
+
+let rr=
+j.routes[0];
+
+
+route=
+rr.geometry.coordinates.map(
+
+c=>({
+
+lng:c[0],
+lat:c[1]
+
+})
+
+);
+
+
+steps=
+rr.legs.flatMap(
+x=>x.steps||[]
+);
+
+
+routeI=0;
+
+
+routeEntity.polyline.positions=
+
+route.map(
+
+p=>
+Cesium.Cartesian3.fromDegrees(
+p.lng,
+p.lat,
+2
+)
+
+);
+
+
+$("eta").textContent=
+
+(rr.distance/1000).toFixed(1)+
+" km • "+
+Math.round(rr.duration/60)+
+" min";
+
+
+$("road").innerHTML=
+
+"<small>"+
+destName.split(",")[0]+
+"</small>";
+
+
+toast(
+re?
+"Rerouted":
+"Route ready"
+);
+
+}
+
+catch(e){
+
+toast(
+"Routing unavailable"
+);
+
+}
+
+}
+
+
+
+function nearest(){
+
+let bi=routeI;
+let bd=1e9;
+
+
+for(
+let i=Math.max(0,routeI-15);
+i<Math.min(route.length,routeI+80);
+i++
+){
+
+let d=
+dist(
+pos,
+route[i]
+);
+
+if(d<bd){
+
+bd=d;
+bi=i;
+
+}
+
+}
+
+
+routeI=bi;
+
+return bd;
+
+}
+
+
+
+function nav(){
+
+if(!route.length)
+return;
+
+
+let off=
+nearest();
+
+let left=0;
+let total=0;
+
+
+for(
+let i=1;
+i<route.length;
+i++
+)
+
+total+=
+dist(
+route[i-1],
+route[i]
+);
+
+
+for(
+let i=routeI+1;
+i<route.length;
+i++
+)
+
+left+=
+dist(
+route[i-1],
+route[i]
+);
+
+
+$("progress").style.width=
+
+(
+total?
+Math.max(
+0,
+Math.min(
+100,
+(1-left/total)*100
+)
+):
+0
+)+"%";
+
+
+let bs=null;
+let bd=1e9;
+
+
+for(let s of steps){
+
+if(!s.maneuver?.location)
+continue;
+
+
+let p={
+
+lng:s.maneuver.location[0],
+lat:s.maneuver.location[1]
+
+};
+
+
+let d=
+dist(
+pos,
+p
+);
+
+
+if(
+d<bd &&
+d<1800
+){
+
+bd=d;
+bs=s;
+
+}
+
+}
+
+
+if(bs){
+
+let m=
+bs.maneuver;
+
+let mod=
+m.modifier||"";
+
+
+let arrow=
+
+mod.includes("left")?
+"↰":
+
+mod.includes("right")?
+"↱":
+
+m.type==="roundabout"?
+"↻":
+"↑";
+
+
+$("miniRoad").style.transform=
+
+`rotate(${
+mod.includes("left")?
+-24:
+mod.includes("right")?
+24:
+m.type==="roundabout"?
+40:
+0
+}deg)`;
+
+
+$("turn").textContent=
+
+arrow+" "+
+
+(
+m.type==="arrive"?
+"Destination":
+
+m.type==="turn"?
+"Turn "+mod:
+
+"Continue"
+)
+
++
+
+(
+bs.name?
+" • "+bs.name:
+""
+);
+
+
+$("distance").textContent=
+
+(
+bd<1000?
+Math.round(bd)+" m":
+(bd/1000).toFixed(1)+" km"
+)
+
++
+
+" • "+
+
+(left/1000).toFixed(1)+
+" km left";
+
+}
+
+
+if(left<20){
+
+$("turn").textContent=
+"🏁 Destination reached";
+
+speed=0;
+
+}
+
+
+if(
+off>55 &&
+performance.now()-lastReroute>9000
+){
+
+lastReroute=
+performance.now();
+
+makeRoute(true);
+
+}
+
+}
+
+
+
+function loop(t){
+
+if(!viewer)
+return;
+
+
+let dt=
+Math.min(
+.04,
+(t-last)/1000
+);
+
+last=t;
+
+
+// PEDAL SMOOTHING
+
+smoothedGas+=
+(gas-smoothedGas)*
+Math.min(
+1,
+dt*7
+);
+
+
+smoothedBrake+=
+(brake-smoothedBrake)*
+Math.min(
+1,
+dt*10
+);
+
+
+let absSp=
+Math.abs(speed);
+
+
+let traction=
+1-
+Math.min(
+.28,
+Math.abs(steer)*
+absSp/
+520
+);
+
+
+let acc=
+
+reverse?
+-17:
+
+absSp<55?
+34:
+
+absSp<120?
+25:
+16;
+
+
+// ACCELERATION
+
+speed+=
+smoothedGas*
+acc*
+traction*
+dt;
+
+
+// BRAKING
+
+let absBrake=
+smoothedBrake*
+(
+absSp>8?
+.92:
+1
+);
+
+
+speed-=
+absBrake*
+64*
+dt;
+
+
+speed-=
+handbrake*
+105*
+dt;
+
+
+// DRAG
+
+speed-=
+
+Math.max(
+1.05,
+absSp*.019
+)
+
+*
+
+Math.sign(
+speed||1
+)
+
+*
+
+dt;
+
+
+speed=
+Math.max(
+-32,
+Math.min(
+205,
+speed
+)
+);
+
+
+if(
+Math.abs(speed)<.2 &&
+!gas
+)
+
+speed=0;
+
+
+// STEERING
+
+let sens=
+
+45/
+(
+1+
+Math.abs(speed)/58
+);
+
+
+let steerCurve=
+
+Math.sign(steer)*
+
+Math.pow(
+Math.abs(steer),
+1.18
+);
+
+
+heading=
+
+(
+heading+
+
+steerCurve*
+sens*
+dt*
+(
+speed>=0?
+1:
+-1
+)
+
++
+
+360
+
+)%360;
+
+
+// ROAD ASSIST
+
+if(
+roadAssist &&
+route.length &&
+Math.abs(speed)>4
+){
+
+nearest();
+
+
+let target=
+
+route[
+
+Math.min(
+
+route.length-1,
+
+routeI+
+
+Math.max(
+3,
+Math.round(
+Math.abs(speed)/18
+)
+)
+
+)
+
+];
+
+
+if(target){
+
+let y=
+
+Math.sin(
+rad(
+target.lng-pos.lng
+)
+)
+
+*
+
+Math.cos(
+rad(
+target.lat
+)
+);
+
+
+let x=
+
+Math.cos(
+rad(
+pos.lat
+)
+)
+
+*
+
+Math.sin(
+rad(
+target.lat
+)
+)
+
+-
+
+Math.sin(
+rad(
+pos.lat
+)
+)
+
+*
+
+Math.cos(
+rad(
+target.lat
+)
+)
+
+*
+
+Math.cos(
+rad(
+target.lng-pos.lng
+)
+);
+
+
+let rh=
+
+(
+deg(
+Math.atan2(
+y,
+x
+)
+)
+
++
+
+360
+
+)%360;
+
+
+let diff=
+
+(
+(
+rh-heading+540
+)%360
+)-180;
+
+
+if(
+Math.abs(diff)<38
+)
+
+heading=
+
+(
+heading+
+
+diff*
+Math.min(
+.14,
+dt*1.8
+)
+
++
+
+360
+
+)%360;
+
+}
+
+}
+
+
+// MOVE CAR
+
+pos=
+move(
+pos,
+heading,
+(speed/3.6)*dt
+);
+
+
+if(
+route.length &&
+nearest()<30
+)
+
+lastSafe={
+...pos
+};
+
+
+// BRAKE LIGHT EFFECT
+
+$("brakeGlow").style.opacity=
+
+(
+smoothedBrake>.1 ||
+handbrake
+)?
+.9:
+0;
+
+
+// FPS
+
+fpsFrames++;
+
+
+if(
+t-fpsStamp>1000
+){
+
+$("fps").textContent=
+
+Math.round(
+
+fpsFrames*
+1000/
+(
+t-fpsStamp
+)
+
+)
+
++
+
+" FPS";
+
+
+fpsFrames=0;
+fpsStamp=t;
+
+}
+
+
+// CAR POSITION
+
+let cp=
+
+Cesium.Cartesian3.fromDegrees(
+pos.lng,
+pos.lat,
+2
+);
+
+
+let ori=
+
+Cesium.Transforms.headingPitchRollQuaternion(
+
+cp,
+
+new Cesium.HeadingPitchRoll(
+rad(heading),
+0,
+0
+)
+
+);
+
+
+car.position=cp;
+car.orientation=ori;
+
+
+// MOVE CAR PARTS
+
+const enu=
+
+Cesium.Transforms.eastNorthUpToFixedFrame(
+cp
+);
+
+
+let h=
+rad(heading);
+
+let cs=
+Math.cos(h);
+
+let sn=
+Math.sin(h);
+
+
+for(
+const e of carParts
+){
+
+let o=
+e._carOffset;
+
+
+let x=
+o[0]*cs+
+o[1]*sn;
+
+
+let y=
+-o[0]*sn+
+o[1]*cs;
+
+
+let local=
+
+new Cesium.Cartesian3(
+x,
+y,
+o[2]
+);
+
+
+let world=
+
+Cesium.Matrix4.multiplyByPoint(
+
+enu,
+
+local,
+
+new Cesium.Cartesian3()
+
+);
+
+
+e.position=world;
+e.orientation=ori;
+
+}
+
+
+// CAMERA SMOOTHING
+
+cameraHeading+=
+
+(
+heading-cameraHeading
+)
+
+*
+
+Math.min(
+1,
+dt*4.2
+);
+
+
+let speedZoom=
+
+Math.min(
+10,
+Math.abs(speed)*.045
+);
+
+
+let camDist=
+
+(
+cameraMode===0?
+18:
+
+cameraMode===1?
+9:
+32
+)
+
++
+
+speedZoom;
+
+
+let camHeight=
+
+(
+cameraMode===0?
+7.2:
+
+cameraMode===1?
+4:
+14
+)
+
++
+
+Math.min(
+4,
+Math.abs(speed)*.018
+);
+
+
+let behind=
+
+move(
+
+pos,
+
+(cameraHeading+180)%360,
+
+camDist+
+Math.abs(speed)*.055
+
+);
+
+
+let cam=
+
+Cesium.Cartesian3.fromDegrees(
+
+behind.lng,
+behind.lat,
+camHeight+
+Math.abs(speed)*.018
+
+);
+
+
+viewer.camera.setView({
+
+destination:cam,
+
+orientation:{
+
+heading:
+rad(cameraHeading),
+
+pitch:
+rad(
+cameraMode===2?
+-18:
+-9
+),
+
+roll:0
+
+}
+
+});
+
+
+// DASHBOARD
+
+$("speed").textContent=
+Math.round(
+Math.abs(speed)
+);
+
+
+$("gear").textContent=
+
+reverse?
+"R":
+
+speed<1?
+"D1":
+
+"D"+
+
+Math.min(
+
+8,
+
+Math.ceil(
+Math.abs(speed)/25
+)
+
+);
+
+
+nav();
+
+requestAnimationFrame(loop);
+
+}
+
+
+// SEARCH
+
+$("go").onclick=
+search;
+
+
+$("q").addEventListener(
+
+"keydown",
+
+e=>
+e.key==="Enter" &&
+search()
+
+);
+
+
+// LOCATION
+
+$("loc").onclick=
+
+()=>navigator.geolocation?.
+
+getCurrentPosition(
+
+p=>{
+
+pos={
+
+lng:p.coords.longitude,
+lat:p.coords.latitude
+
+};
+
+toast(
+"Location set"
+);
+
+},
+
+()=>toast(
+"Location unavailable"
+)
+
+);
+
+
+// STEERING WHEEL
+
+let wheel=
+$("wheel");
+
+let wa=false;
+
+
+function wm(e){
+
+if(!wa)
+return;
+
+
+let r=
+wheel.getBoundingClientRect();
+
+
+let x=
+
+e.clientX-
+r.left-
+r.width/2;
+
+
+steer=
+
+Math.max(
+
+-1,
+
+Math.min(
+
+1,
+
+x/
+(
+r.width*.4
+)
+
+)
+
+);
+
+
+wheel.style.transform=
+
+`rotate(${steer*115}deg)`;
+
+}
+
+
+wheel.onpointerdown=
+
+e=>{
+
+wa=true;
+
+wheel.setPointerCapture(
+e.pointerId
+);
+
+wm(e);
+
+};
+
+
+wheel.onpointermove=
+wm;
+
+
+wheel.onpointerup=
+wheel.onpointercancel=
+
+()=>{
+
+wa=false;
+steer=0;
+
+wheel.style.transition=
+".22s";
+
+wheel.style.transform=
+"rotate(0)";
+
+setTimeout(
+
+()=>wheel.style.transition="",
+
+230
+
+);
+
+};
+
+
+// PEDALS
+
+function pedal(id,set){
+
+let e=$(id);
+
+
+e.onpointerdown=
+
+x=>{
+
+x.preventDefault();
+
+e.setPointerCapture(
+x.pointerId
+);
+
+e.classList.add(
+"on"
+);
+
+set(1);
+
+};
+
+
+e.onpointerup=
+e.onpointercancel=
+
+()=>{
+
+e.classList.remove(
+"on"
+);
+
+set(0);
+
+};
+
+}
+
+
+pedal(
+"gas",
+v=>gas=v
+);
+
+
+pedal(
+"brake",
+v=>brake=v
+);
+
+
+// HANDBRAKE
+
+$("handbrake").onpointerdown=
+
+e=>{
+
+e.preventDefault();
+
+handbrake=1;
+
+$("handbrake").style.transform=
+"translateY(5px)";
+
+};
+
+
+$("handbrake").onpointerup=
+$("handbrake").onpointercancel=
+
+()=>{
+
+handbrake=0;
+
+$("handbrake").style.transform="";
+
+};
+
+
+// GEAR
+
+$("gear").onclick=
+
+()=>{
+
+if(
+Math.abs(speed)<2
+){
+
+reverse=!reverse;
+
+$("gear").textContent=
+
+reverse?
+"R":
+"D1";
+
+toast(
+
+reverse?
+"Reverse":
+"Drive"
+
+);
+
+}
+
+else{
+
+toast(
+"Stop before changing direction"
+);
+
+}
+
+};
+
+
+// CAMERA
+
+$("camera").onclick=
+
+()=>{
+
+cameraMode=
+(cameraMode+1)%3;
+
+toast(
+
+[
+"Chase camera",
+"Close camera",
+"Wide camera"
+][cameraMode]
+
+);
+
+};
+
+
+// LIGHTING
+
+$("lights").onclick=
+
+()=>{
+
+lightsOn=
+!lightsOn;
+
+$("lights").style.background=
+
+lightsOn?
+"#c79b13":
+"#35485c";
+
+
+viewer.scene.globe.enableLighting=
+lightsOn;
+
+
+toast(
+
+lightsOn?
+"Night lighting ON":
+"Night lighting OFF"
+
+);
+
+};
+
+
+// ROAD ASSIST
+
+$("assist").onclick=
+
+()=>{
+
+roadAssist=
+!roadAssist;
+
+
+$("assist").classList.toggle(
+
+"off",
+
+!roadAssist
+
+);
+
+
+$("assist").textContent=
+
+roadAssist?
+"ROAD ASSIST":
+"FREE DRIVE";
+
+
+toast(
+
+roadAssist?
+"Gentle road assist ON":
+"Free driving ON"
+
+);
+
+};
+
+
+// GRAPHICS QUALITY
+
+$("quality").onclick=
+
+()=>{
+
+qualityMode=
+(qualityMode+1)%3;
+
+
+let labels=[
+
+"AUTO",
+"PERFORMANCE",
+"QUALITY"
+
+];
+
+
+let ratios=[
+
+Math.min(
+devicePixelRatio,
+1.5
+),
+
+1,
+
+Math.min(
+devicePixelRatio,
+2
+)
+
+];
+
+
+viewer.resolutionScale=
+ratios[qualityMode];
+
+
+$("quality").textContent=
+labels[qualityMode];
+
+
+toast(
+
+labels[qualityMode]+
+" graphics"
+
+);
+
+};
+
+
+// RESET
+
+$("reset").onclick=
+
+()=>{
+
+speed=0;
+
+pos={
+...lastSafe
+};
+
+toast(
+"Car reset to road"
+);
+
+};
+
+
+// KEYBOARD CONTROLS
+
+addEventListener(
+
+"keydown",
+
+e=>{
+
+if(
+e.key==="ArrowUp" ||
+e.key==="w"
+)
+gas=1;
+
+
+if(
+e.key==="ArrowDown" ||
+e.key==="s"
+)
+brake=1;
+
+
+if(
+e.key==="ArrowLeft" ||
+e.key==="a"
+)
+steer=-1;
+
+
+if(
+e.key==="ArrowRight" ||
+e.key==="d"
+)
+steer=1;
+
+
+if(
+e.key===" "
+)
+handbrake=1;
+
+}
+
+);
+
+
+addEventListener(
+
+"keyup",
+
+e=>{
+
+if(
+e.key==="ArrowUp" ||
+e.key==="w"
+)
+gas=0;
+
+
+if(
+e.key==="ArrowDown" ||
+e.key==="s"
+)
+brake=0;
+
+
+if(
+e.key==="ArrowLeft" ||
+e.key==="a" ||
+e.key==="ArrowRight" ||
+e.key==="d"
+)
+steer=0;
+
+
+if(
+e.key===" "
+)
+handbrake=0;
+
+}
+
+);
+
+</script>
+
+</body>
+   </html>
