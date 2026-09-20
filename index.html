@@ -3,183 +3,418 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<title>World Drive 3D — Real Earth</title>
 
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.10.0/dist/maplibre-gl.css">
+<title>World Drive 3D — Ultimate</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.css">
 
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+*{
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent
+}
 
 html,body,#map{
- margin:0;width:100%;height:100%;overflow:hidden;
- background:#071019;font-family:system-ui,sans-serif;
- touch-action:none
+margin:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:#071018;
+font-family:Inter,system-ui,sans-serif;
+touch-action:none
 }
 
-#map{position:fixed;inset:0}
-
-.panel{
- background:#07131ee6;color:white;
- border:1px solid #ffffff2d;
- backdrop-filter:blur(12px);
- box-shadow:0 8px 28px #0008
-}
-
-#search{
- position:fixed;z-index:20;
- top:max(10px,env(safe-area-inset-top));
- left:50%;transform:translateX(-50%);
- width:min(760px,94vw);
- padding:7px;border-radius:15px;
- display:flex;gap:6px
-}
-
-#q{
- flex:1;min-width:0;border:0;
- border-radius:10px;padding:12px;font-size:16px
-}
-
-button{
- border:0;border-radius:10px;
- padding:10px 12px;
- background:#0878b9;color:white;
- font-weight:800
-}
-
-#hud{
- position:fixed;z-index:20;
- left:10px;top:74px;
- padding:10px 13px;border-radius:14px;
- min-width:105px
-}
-
-#speed{
- font-size:34px;font-weight:950;line-height:1
-}
-
-.small{font-size:11px;opacity:.75}
-
-#gps{
- position:fixed;z-index:20;
- right:10px;top:74px;
- width:min(270px,48vw);
- padding:10px;border-radius:14px
-}
-
-#turn{font-size:18px;font-weight:850}
-#status{font-size:11px;opacity:.75;margin-top:5px}
-
-.ctrl{
- position:fixed;z-index:25;
- bottom:max(18px,env(safe-area-inset-bottom));
- user-select:none
-}
-
-.pad{
- width:72px;height:72px;
- border-radius:50%;
- display:grid;place-items:center;
- font-size:30px;
- background:#07131ed9;
- border:1px solid #ffffff55;
- color:#fff
-}
-
-.left{left:16px}
-.right{left:96px}
-
-.gas{
- right:16px;
- width:82px;height:82px;
- background:#075e39dd
-}
-
-.brake{
- right:108px;
- width:72px;height:72px;
- background:#7b2020dd
-}
-
-/* CAR */
-#car{
- position:fixed;
- z-index:18;
- left:50%;
- bottom:19%;
- transform:translateX(-50%);
- width:78px;
- height:142px;
- pointer-events:none;
- filter:drop-shadow(0 12px 8px #000b)
-}
-
-.body{
- position:absolute;
- inset:8px 10px;
- border-radius:28px 28px 20px 20px;
- background:linear-gradient(
- 90deg,#b58b00,#ffe04c 42%,#c59a00
- );
- border:2px solid #ffe98b
+#map{
+position:fixed;
+inset:0
 }
 
 .glass{
- position:absolute;
- left:20px;right:20px;
- top:28px;height:43px;
- background:#10283ad9;
- border-radius:14px 14px 8px 8px;
- border:2px solid #8ed8ff55
+background:#07131de8;
+color:#fff;
+border:1px solid #ffffff35;
+backdrop-filter:blur(12px);
+box-shadow:0 8px 30px #0009
+}
+
+/* SEARCH */
+
+#top{
+position:fixed;
+z-index:30;
+top:max(8px,env(safe-area-inset-top));
+left:50%;
+transform:translateX(-50%);
+width:min(760px,94vw);
+display:flex;
+gap:6px;
+padding:7px;
+border-radius:15px
+}
+
+#q{
+flex:1;
+min-width:0;
+border:0;
+border-radius:10px;
+padding:12px;
+font-size:15px
+}
+
+button{
+border:0;
+border-radius:10px;
+background:#0878b9;
+color:#fff;
+padding:10px 12px;
+font-weight:850
+}
+
+/* SPEED */
+
+#hud{
+position:fixed;
+z-index:25;
+left:10px;
+top:74px;
+padding:10px 14px;
+border-radius:14px;
+min-width:110px
+}
+
+#speed{
+font-size:36px;
+font-weight:950;
+line-height:1
+}
+
+.tiny{
+font-size:11px;
+opacity:.78
+}
+
+/* GPS */
+
+#nav{
+position:fixed;
+z-index:25;
+right:10px;
+top:74px;
+width:min(300px,54vw);
+padding:11px;
+border-radius:14px
+}
+
+#maneuver{
+font-size:20px;
+font-weight:900;
+line-height:1.15
+}
+
+#nextdist{
+font-size:15px;
+font-weight:800;
+margin-top:4px
+}
+
+#eta{
+margin-top:5px
+}
+
+#mode{
+position:fixed;
+z-index:24;
+left:10px;
+top:177px;
+padding:7px 10px;
+border-radius:11px;
+font-size:11px
+}
+
+/* CAR */
+
+#car{
+position:fixed;
+z-index:19;
+left:50%;
+bottom:17%;
+transform:translateX(-50%);
+width:88px;
+height:154px;
+pointer-events:none;
+filter:drop-shadow(0 15px 8px #000b);
+perspective:400px
+}
+
+.carbody{
+position:absolute;
+inset:7px 10px;
+border-radius:33px 33px 20px 20px;
+
+background:
+linear-gradient(
+90deg,
+#8e6800,
+#ffe85a 35%,
+#d2a900 67%,
+#765400
+);
+
+border:2px solid #fff09a;
+transform:rotateX(8deg)
+}
+
+.wind{
+position:absolute;
+left:21px;
+right:21px;
+top:29px;
+height:43px;
+
+background:
+linear-gradient(
+#183b50,
+#08151e
+);
+
+border-radius:15px 15px 7px 7px;
+border:2px solid #8ed8ff55
 }
 
 .rear{
- position:absolute;
- left:19px;right:19px;
- bottom:25px;height:27px;
- background:#111;border-radius:5px
+position:absolute;
+left:18px;
+right:18px;
+bottom:25px;
+height:25px;
+background:#161616;
+border-radius:5px
 }
 
-.wheel{
- position:absolute;
- width:12px;height:30px;
- background:#090909;
- border-radius:5px
+.lamp{
+position:absolute;
+bottom:31px;
+width:19px;
+height:7px;
+background:#e62929;
+box-shadow:0 0 9px #f22
 }
 
-.w1{left:2px;top:27px}
-.w2{right:2px;top:27px}
-.w3{left:2px;bottom:23px}
-.w4{right:2px;bottom:23px}
+.l1{left:15px}
+.l2{right:15px}
 
-#loading{
- position:fixed;z-index:50;inset:0;
- display:grid;place-items:center;
- background:#06111a;color:white;
- font-weight:800
+/* STEERING WHEEL */
+
+#wheelCtl{
+position:fixed;
+z-index:35;
+left:18px;
+bottom:max(20px,env(safe-area-inset-bottom));
+
+width:150px;
+height:150px;
+
+border-radius:50%;
+
+background:
+radial-gradient(
+circle,
+#222 0 20%,
+transparent 21%
+),
+
+conic-gradient(
+#111 0 12%,
+#555 12% 17%,
+#111 17% 45%,
+#555 45% 50%,
+#111 50% 78%,
+#555 78% 83%,
+#111 83%
+);
+
+border:12px solid #111;
+
+box-shadow:
+0 8px 25px #000b,
+inset 0 0 0 3px #777;
+
+touch-action:none
+}
+
+#wheelCtl:after{
+content:"";
+position:absolute;
+left:50%;
+top:50%;
+width:16px;
+height:58px;
+background:#333;
+transform:translate(-50%,-50%);
+border-radius:8px
+}
+
+/* PEDALS */
+
+#pedals{
+position:fixed;
+z-index:35;
+right:18px;
+bottom:max(20px,env(safe-area-inset-bottom));
+
+display:flex;
+gap:14px;
+align-items:flex-end
+}
+
+.pedal{
+touch-action:none;
+color:#ddd;
+
+background:
+linear-gradient(
+#666,
+#222
+);
+
+border:2px solid #888;
+border-radius:9px 9px 16px 16px;
+
+box-shadow:
+0 9px 18px #000a,
+inset 0 0 0 3px #333;
+
+font-weight:900;
+letter-spacing:.5px
+}
+
+#brake{
+width:66px;
+height:102px
+}
+
+#gas{
+width:58px;
+height:128px
+}
+
+.pedal.on{
+transform:translateY(8px);
+filter:brightness(.75)
+}
+
+/* GEAR */
+
+#gear{
+position:fixed;
+z-index:30;
+left:50%;
+bottom:12px;
+
+transform:translateX(-50%);
+
+padding:6px 10px;
+border-radius:10px;
+
+color:#fff;
+font-weight:900;
+background:#07131ddd
+}
+
+/* WEATHER */
+
+#weather{
+position:fixed;
+z-index:21;
+inset:0;
+pointer-events:none;
+opacity:0;
+
+transition:.4s;
+
+background:
+repeating-linear-gradient(
+105deg,
+transparent 0 16px,
+#b9e9ff55 17px 18px,
+transparent 19px 30px
+)
+}
+
+#shade{
+position:fixed;
+z-index:20;
+inset:0;
+pointer-events:none;
+transition:.5s;
+background:transparent
+}
+
+/* MESSAGE */
+
+#toast{
+position:fixed;
+z-index:50;
+left:50%;
+top:135px;
+transform:translateX(-50%);
+
+padding:8px 12px;
+border-radius:10px;
+
+color:#fff;
+display:none
 }
 
 #credit{
- position:fixed;
- z-index:19;
- left:50%;bottom:5px;
- transform:translateX(-50%);
- font-size:9px;color:#fff9;
- text-shadow:0 1px 3px #000;
- white-space:nowrap
+position:fixed;
+z-index:23;
+
+left:50%;
+bottom:2px;
+
+transform:translateX(-50%);
+
+font-size:8px;
+color:#fffb;
+text-shadow:0 1px 3px #000;
+white-space:nowrap
 }
 
 @media(max-width:650px){
- #gps{top:140px;width:55vw}
- #hud{top:72px}
- .pad{width:64px;height:64px}
- .gas{width:74px;height:74px}
- .right{left:88px}
- .brake{right:98px}
- #car{
-   transform:translateX(-50%) scale(.82);
-   bottom:17%
- }
+
+#nav{
+top:132px;
+width:58vw
 }
+
+#mode{
+top:178px
+}
+
+#wheelCtl{
+width:125px;
+height:125px;
+border-width:10px
+}
+
+.pedal{
+transform:scale(.9);
+transform-origin:bottom right
+}
+
+#car{
+transform:
+translateX(-50%)
+scale(.8);
+
+bottom:16%
+}
+
+}
+
 </style>
 </head>
 
@@ -187,780 +422,259 @@ button{
 
 <div id="map"></div>
 
-<div id="loading">Loading real Earth 3D…</div>
+<div id="weather"></div>
+<div id="shade"></div>
 
-<div id="search" class="panel">
- <input id="q" placeholder="Search any real place or address…">
- <button id="go">GO</button>
- <button id="me">⌖</button>
+<!-- SEARCH -->
+
+<div id="top" class="glass">
+
+<input
+id="q"
+placeholder="Search any real place or address">
+
+<button id="go">
+ROUTE
+</button>
+
+<button id="loc">
+⌖
+</button>
+
+<button id="fx">
+☀
+</button>
+
 </div>
 
-<div id="hud" class="panel">
- <div id="speed">0</div>
- <div class="small">km/h</div>
- <div id="road" class="small">Abu Dhabi</div>
+<!-- SPEED -->
+
+<div id="hud" class="glass">
+
+<div id="speed">
+0
 </div>
 
-<div id="gps" class="panel">
- <div id="turn">Search a destination</div>
- <div id="distance" class="small">
-   Real-road GPS routing
- </div>
- <div id="status">
-   Terrain + buildings + satellite
- </div>
+<div class="tiny">
+km/h
 </div>
+
+<div id="road" class="tiny">
+Abu Dhabi
+</div>
+
+</div>
+
+<!-- GPS -->
+
+<div id="nav" class="glass">
+
+<div id="maneuver">
+Search a destination
+</div>
+
+<div id="nextdist">
+Real-road navigation
+</div>
+
+<div id="eta" class="tiny">
+GPS ready
+</div>
+
+</div>
+
+<div id="mode" class="glass">
+3D TERRAIN • SATELLITE • BUILDINGS
+</div>
+
+<!-- CAR -->
 
 <div id="car">
- <div class="body"></div>
- <div class="glass"></div>
- <div class="rear"></div>
- <i class="wheel w1"></i>
- <i class="wheel w2"></i>
- <i class="wheel w3"></i>
- <i class="wheel w4"></i>
+
+<div class="carbody"></div>
+
+<div class="wind"></div>
+
+<div class="rear"></div>
+
+<i class="lamp l1"></i>
+<i class="lamp l2"></i>
+
 </div>
 
-<button class="ctrl pad left" data-key="left">◀</button>
-<button class="ctrl pad right" data-key="right">▶</button>
-<button class="ctrl pad brake" data-key="brake">BRAKE</button>
-<button class="ctrl pad gas" data-key="gas">GAS</button>
+<!-- STEERING -->
+
+<div id="wheelCtl"></div>
+
+<!-- PEDALS -->
+
+<div id="pedals">
+
+<button
+id="brake"
+class="pedal">
+BRAKE
+</button>
+
+<button
+id="gas"
+class="pedal">
+GAS
+</button>
+
+</div>
+
+<div id="gear">
+D
+</div>
+
+<div
+id="toast"
+class="glass">
+</div>
 
 <div id="credit">
- Map © OpenStreetMap contributors · Satellite © Esri
+© OpenStreetMap contributors · Satellite © Esri · routing by OSRM
 </div>
 
 <script type="module">
 
 import * as maplibregl
-from 'https://unpkg.com/maplibre-gl@6.10.0/dist/maplibre-gl.mjs';
+from
+'https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.mjs';
 
-const start={
- lng:54.3773,
- lat:24.4539
+
+const $ =
+id =>
+document.getElementById(id);
+
+
+/* =========================
+   GAME STATE
+========================= */
+
+let pos = {
+lng:54.3773,
+lat:24.4539
 };
 
-let pos={...start};
-let heading=35;
-let speed=0;
-
-let route=[];
-let routeIndex=0;
-let routeData=null;
-
-let last=performance.now();
-
-const keys={
- left:false,
- right:false,
- gas:false,
- brake:false
-};
-
-const style={
- version:8,
-
- sources:{
-
-  sat:{
-   type:'raster',
-   tiles:[
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-   ],
-   tileSize:256,
-   attribution:'Tiles © Esri'
-  },
-
-  vector:{
-   type:'vector',
-   url:'https://tiles.openfreemap.org/planet'
-  },
-
-  terrain:{
-   type:'raster-dem',
-   url:'https://demotiles.maplibre.org/terrain-tiles/tiles.json',
-   tileSize:256
-  }
- },
-
- layers:[
-
-  {
-   id:'sat',
-   type:'raster',
-   source:'sat',
-
-   paint:{
-    'raster-saturation':-.05,
-    'raster-contrast':.08
-   }
-  },
+let heading = 35;
 
-  {
-   id:'buildings',
-   type:'fill-extrusion',
-   source:'vector',
-   'source-layer':'building',
-   minzoom:14,
-
-   paint:{
+let speed = 0;
 
-    'fill-extrusion-color':[
-     'interpolate',
-     ['linear'],
-     ['coalesce',
-      ['get','render_height'],
-      ['get','height'],
-      8
-     ],
+let steer = 0;
 
-     0,'#b8b5aa',
-     40,'#d8d2c5',
-     160,'#eee8dc'
-    ],
+let throttle = 0;
 
-    'fill-extrusion-height':[
-     'coalesce',
-     ['get','render_height'],
-     ['get','height'],
-     8
-    ],
+let braking = 0;
 
-    'fill-extrusion-base':[
-     'coalesce',
-     ['get','render_min_height'],
-     ['get','min_height'],
-     0
-    ],
+let route = [];
 
-    'fill-extrusion-opacity':.9
-   }
-  }
- ],
+let steps = [];
 
- terrain:{
-  source:'terrain',
-  exaggeration:1.15
- }
-};
+let routeIndex = 0;
 
-const map=new maplibregl.Map({
+let last =
+performance.now();
 
- container:'map',
+let lastReroute = 0;
 
- style:style,
+let destination = null;
 
- center:[
-  pos.lng,
-  pos.lat
- ],
+let destName = "";
 
- zoom:17.5,
+let fx = 0;
 
- pitch:72,
 
- bearing:heading,
+/* =========================
+   REAL WORLD MAP
+========================= */
 
- canvasContextAttributes:{
-  antialias:true
- },
+const style = {
 
- maxPitch:85
-});
+version:8,
 
-map.on('load',()=>{
+sources:{
 
- document.getElementById('loading').style.display='none';
+sat:{
 
- map.addSource('route',{
+type:"raster",
 
-  type:'geojson',
+tiles:[
 
-  data:{
-   type:'Feature',
+"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
 
-   geometry:{
-    type:'LineString',
-    coordinates:[]
-   }
-  }
- });
+],
 
- map.addLayer({
+tileSize:256,
 
-  id:'routeGlow',
+attribution:"© Esri"
 
-  type:'line',
+},
 
-  source:'route',
+vector:{
 
-  paint:{
-   'line-color':'#031d2d',
-   'line-width':10,
-   'line-opacity':.75
-  }
- });
+type:"vector",
 
- map.addLayer({
+url:
+"https://tiles.openfreemap.org/planet"
 
-  id:'routeLine',
+},
 
-  type:'line',
+dem:{
 
-  source:'route',
+type:"raster-dem",
 
-  paint:{
-   'line-color':'#24c9ff',
-   'line-width':5,
-   'line-opacity':.95
-  }
- });
+url:
+"https://demotiles.maplibre.org/terrain-tiles/tiles.json",
 
-});
-
-function rad(x){
- return x*Math.PI/180;
-}
-
-function deg(x){
- return x*180/Math.PI;
-}
-
-function dist(a,b){
-
- const R=6371000;
-
- const p1=rad(a.lat);
- const p2=rad(b.lat);
-
- const dp=rad(b.lat-a.lat);
- const dl=rad(b.lng-a.lng);
-
- const h=
- Math.sin(dp/2)**2+
- Math.cos(p1)*
- Math.cos(p2)*
- Math.sin(dl/2)**2;
-
- return 2*R*Math.asin(Math.sqrt(h));
-}
-
-function bearing(a,b){
-
- const y=
- Math.sin(rad(b.lng-a.lng))*
- Math.cos(rad(b.lat));
-
- const x=
- Math.cos(rad(a.lat))*
- Math.sin(rad(b.lat))-
- Math.sin(rad(a.lat))*
- Math.cos(rad(b.lat))*
- Math.cos(rad(b.lng-a.lng));
-
- return(
-  deg(Math.atan2(y,x))+360
- )%360;
-}
-
-function move(p,brg,m){
-
- const R=6378137;
-
- const d=m/R;
-
- const b=rad(brg);
-
- const p1=rad(p.lat);
-
- const l1=rad(p.lng);
-
- const p2=Math.asin(
-  Math.sin(p1)*Math.cos(d)+
-  Math.cos(p1)*
-  Math.sin(d)*
-  Math.cos(b)
- );
-
- const l2=
- l1+
- Math.atan2(
-  Math.sin(b)*
-  Math.sin(d)*
-  Math.cos(p1),
-
-  Math.cos(d)-
-  Math.sin(p1)*
-  Math.sin(p2)
- );
-
- return{
-  lat:deg(p2),
-  lng:deg(l2)
- };
-}
-
-async function search(){
-
- const q=
- document.getElementById('q')
- .value.trim();
-
- if(!q)return;
-
- setStatus('Finding place…');
-
- try{
-
-  const r=await fetch(
-   'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q='+
-   encodeURIComponent(q),
-   {
-    headers:{
-     'Accept-Language':'en'
-    }
-   }
-  );
-
-  const j=await r.json();
-
-  if(!j.length)throw 0;
-
-  const dest={
-   lng:+j[0].lon,
-   lat:+j[0].lat
-  };
-
-  await routeTo(
-   dest,
-   j[0].display_name
-  );
-
- }
- catch(e){
-
-  setStatus(
-   'Place not found. Try a more specific address.'
-  );
-
- }
-}
-
-async function routeTo(dest,name){
-
- setStatus(
-  'Calculating real-road route…'
- );
-
- try{
-
-  const u=
-  `https://router.project-osrm.org/route/v1/driving/${pos.lng},${pos.lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson&steps=true`;
-
-  const r=await fetch(u);
-
-  const j=await r.json();
-
-  if(!j.routes?.length)
-   throw 0;
-
-  route=
-  j.routes[0]
-  .geometry
-  .coordinates
-  .map(c=>({
-   lng:c[0],
-   lat:c[1]
-  }));
-
-  routeData=j.routes[0];
-
-  routeIndex=0;
-
-  map.getSource('route').setData({
-
-   type:'Feature',
-
-   geometry:{
-    type:'LineString',
-    coordinates:
-    j.routes[0]
-    .geometry
-    .coordinates
-   }
-
-  });
-
-  document
-  .getElementById('turn')
-  .textContent=
-  'Route ready — drive!';
-
-  document
-  .getElementById('distance')
-  .textContent=
-  (j.routes[0].distance/1000)
-  .toFixed(1)
-  +' km · '+
-  Math.round(
-   j.routes[0].duration/60
-  )
-  +' min';
-
-  document
-  .getElementById('road')
-  .textContent=
-  name.split(',')[0];
-
-  setStatus('GPS active');
-
- }
- catch(e){
-
-  setStatus(
-   'Routing service unavailable. Try again.'
-  );
-
- }
-}
-
-function setStatus(s){
-
- document
- .getElementById('status')
- .textContent=s;
+tileSize:256
 
 }
 
-function gpsUpdate(){
+},
 
- if(!route.length)return;
+layers:[
 
- let best=routeIndex;
+{
 
- let bestD=1e9;
+id:"sat",
 
- for(
-  let i=Math.max(0,routeIndex-8);
-  i<Math.min(
-   route.length,
-   routeIndex+35
-  );
-  i++
- ){
+type:"raster",
 
-  let d=dist(
-   pos,
-   route[i]
-  );
+source:"sat",
 
-  if(d<bestD){
+paint:{
 
-   bestD=d;
+"raster-saturation":-.08,
 
-   best=i;
+"raster-contrast":.1,
 
-  }
- }
+"raster-brightness-min":.05
 
- routeIndex=best;
-
- const target=
- route[
-  Math.min(
-   route.length-1,
-   routeIndex+8
-  )
- ];
-
- const dleft=
- route
- .slice(routeIndex)
- .reduce(
-  (s,p,i,a)=>
-  i?s+dist(a[i-1],p):s,
-  0
- );
-
- document
- .getElementById('distance')
- .textContent=
- dleft<1000
- ?
- Math.round(dleft)+' m remaining'
- :
- (dleft/1000).toFixed(1)+
- ' km remaining';
-
- const delta=
- (
-  (
-   bearing(pos,target)-
-   heading+
-   540
-  )%360
- )-180;
-
- document
- .getElementById('turn')
- .textContent=
- Math.abs(delta)<15
- ?
- '↑ Continue'
- :
- delta>0
- ?
- '↗ Turn right ahead'
- :
- '↖ Turn left ahead';
-
- if(dleft<25){
-
-  document
-  .getElementById('turn')
-  .textContent=
-  '✓ Destination reached';
-
-  speed=0;
-
- }
 }
 
-function frame(t){
+},
 
- const dt=
- Math.min(
-  .05,
-  (t-last)/1000
- );
+{
 
- last=t;
+id:"buildings",
 
- if(keys.gas)
-  speed+=25*dt;
+type:"fill-extrusion",
 
- if(keys.brake)
-  speed-=45*dt;
+source:"vector",
 
- speed-=3.2*dt;
+"source-layer":"building",
 
- speed=
- Math.max(
-  0,
-  Math.min(
-   145,
-   speed
-  )
- );
+minzoom:14,
 
- const steer=
- (keys.left?-1:0)+
- (keys.right?1:0);
+paint:{
 
- heading=
- (
-  heading+
-  steer*
-  (25+speed*.45)*
-  dt+
-  360
- )%360;
+"fill-extrusion-color":[
 
- pos=
- move(
-  pos,
-  heading,
-  (speed/3.6)*dt
- );
+"interpolate",
 
- document
- .getElementById('speed')
- .textContent=
- Math.round(speed);
+["linear"],
 
- gpsUpdate();
-
- map.jumpTo({
-
-  center:[
-   pos.lng,
-   pos.lat
-  ],
-
-  bearing:heading,
-
-  pitch:72,
-
-  zoom:17.6
-
- });
-
- requestAnimationFrame(frame);
-}
-
-requestAnimationFrame(frame);
-
-document
-.getElementById('go')
-.onclick=search;
-
-document
-.getElementById('q')
-.addEventListener(
- 'keydown',
- e=>{
-  if(e.key==='Enter')
-   search();
- }
-);
-
-document
-.getElementById('me')
-.onclick=()=>{
-
- if(navigator.geolocation)
-
- navigator.geolocation
- .getCurrentPosition(
-
-  p=>{
-
-   pos={
-    lng:p.coords.longitude,
-    lat:p.coords.latitude
-   };
-
-   map.jumpTo({
-    center:[
-     pos.lng,
-     pos.lat
-    ]
-   });
-
-   setStatus(
-    'Moved to your location'
-   );
-
-  },
-
-  ()=>setStatus(
-   'Location permission not available'
-  )
-
- );
-
-};
-
-for(
- const el of
- document.querySelectorAll(
-  '[data-key]'
- )
-){
-
- const k=el.dataset.key;
-
- for(
-  const ev of
-  ['pointerdown','touchstart']
- ){
-
-  el.addEventListener(
-   ev,
-   e=>{
-    e.preventDefault();
-    keys[k]=true;
-   },
-   {passive:false}
-  );
-
- }
-
- for(
-  const ev of
-  [
-   'pointerup',
-   'pointercancel',
-   'pointerleave',
-   'touchend'
-  ]
- ){
-
-  el.addEventListener(
-   ev,
-   e=>{
-    e.preventDefault();
-    keys[k]=false;
-   },
-   {passive:false}
-  );
-
- }
-}
-
-addEventListener(
- 'keydown',
- e=>{
-
-  if(
-   e.key==='ArrowLeft'||
-   e.key==='a'
-  )
-   keys.left=true;
-
-  if(
-   e.key==='ArrowRight'||
-   e.key==='d'
-  )
-   keys.right=true;
-
-  if(
-   e.key==='ArrowUp'||
-   e.key==='w'
-  )
-   keys.gas=true;
-
-  if(
-   e.key==='ArrowDown'||
-   e.key==='s'
-  )
-   keys.brake=true;
-
- }
-);
-
-addEventListener(
- 'keyup',
- e=>{
-
-  if(
-   e.key==='ArrowLeft'||
-   e.key==='a'
-  )
-   keys.left=false;
-
-  if(
-   e.key==='ArrowRight'||
-   e.key==='d'
-  )
-   keys.right=false;
-
-  if(
-   e.key==='ArrowUp'||
-   e.key==='w'
-  )
-   keys.gas=false;
-
-  if(
-   e.key==='ArrowDown'||
-   e.key==='s'
-  )
-   keys.brake=false;
-
- }
-);
-
-</script>
-
-</body>
- </html>
+[
+"
