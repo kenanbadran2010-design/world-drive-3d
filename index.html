@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
-<title>World Drive 3D — Cesium Edition</title>
+<title>World Drive 3D — S7 FE</title>
 
 <script>
 window.CESIUM_BASE_URL =
@@ -14,441 +14,392 @@ window.CESIUM_BASE_URL =
 <link rel="stylesheet"
 href="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Widgets/widgets.css">
 
-<script
-src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js"></script>
 
 <style>
-
 *{
-box-sizing:border-box;
--webkit-tap-highlight-color:transparent
+ box-sizing:border-box;
+ -webkit-tap-highlight-color:transparent
 }
 
 html,body,#world{
-margin:0;
-width:100%;
-height:100%;
-overflow:hidden;
-background:#05080d;
-font-family:system-ui,sans-serif;
-touch-action:none
+ margin:0;
+ width:100%;
+ height:100%;
+ overflow:hidden;
+ background:#05080d;
+ font-family:system-ui,sans-serif;
+ touch-action:none
 }
 
 .cesium-viewer-toolbar,
 .cesium-viewer-animationContainer,
 .cesium-viewer-timelineContainer,
 .cesium-viewer-fullscreenContainer{
-display:none!important
+ display:none!important
 }
 
 .glass{
-background:#07111de8;
-color:#fff;
-border:1px solid #ffffff35;
-backdrop-filter:blur(10px);
-box-shadow:0 7px 25px #0008
+ background:#07111de8;
+ color:white;
+ border:1px solid #ffffff35;
+ backdrop-filter:blur(10px);
+ box-shadow:0 7px 25px #0008
 }
 
 #search{
-position:fixed;
-z-index:20;
-left:50%;
-top:max(8px,env(safe-area-inset-top));
-transform:translateX(-50%);
-width:min(720px,94vw);
-padding:6px;
-border-radius:14px;
-display:flex;
-gap:6px
+ position:fixed;
+ z-index:20;
+ left:50%;
+ top:max(8px,env(safe-area-inset-top));
+ transform:translateX(-50%);
+ width:min(760px,70vw);
+ padding:6px;
+ border-radius:14px;
+ display:flex;
+ gap:6px
 }
 
 #q{
-flex:1;
-min-width:0;
-border:0;
-border-radius:9px;
-padding:11px;
-font-size:15px
+ flex:1;
+ border:0;
+ border-radius:9px;
+ padding:11px;
+ font-size:15px
 }
 
 button{
-border:0;
-border-radius:9px;
-background:#147bb6;
-color:white;
-font-weight:900;
-padding:9px 11px
+ border:0;
+ border-radius:9px;
+ background:#147bb6;
+ color:white;
+ font-weight:900;
+ padding:9px 11px
 }
 
 #dash{
-position:fixed;
-z-index:20;
-left:10px;
-top:70px;
-padding:9px 13px;
-border-radius:14px;
-min-width:115px
+ position:fixed;
+ z-index:20;
+ left:10px;
+ top:70px;
+ padding:9px 13px;
+ border-radius:14px;
+ min-width:115px
 }
 
 #speed{
-font-size:38px;
-font-weight:1000;
-line-height:1
+ font-size:38px;
+ font-weight:1000;
+ line-height:1
 }
 
 small{opacity:.72}
 
 #nav{
-position:fixed;
-z-index:20;
-right:10px;
-top:70px;
-width:min(330px,57vw);
-padding:10px;
-border-radius:14px
+ position:fixed;
+ z-index:20;
+ right:10px;
+ top:70px;
+ width:350px;
+ padding:10px;
+ border-radius:14px
 }
 
 #turn{
-font-size:17px;
-font-weight:950
+ font-size:17px;
+ font-weight:950
 }
 
 #distance{
-font-size:13px;
-margin-top:4px
+ font-size:13px;
+ margin-top:4px
 }
 
 #status{
-position:fixed;
-z-index:21;
-left:10px;
-top:167px;
-padding:6px 9px;
-border-radius:9px;
-font-size:10px
-}
-
-#wheel{
-position:fixed;
-z-index:30;
-left:18px;
-bottom:max(18px,env(safe-area-inset-bottom));
-width:140px;
-height:140px;
-border:13px solid #151515;
-border-radius:50%;
-background:
-radial-gradient(circle,#333 0 19%,transparent 20%),
-conic-gradient(
-#111 0 12%,
-#777 12% 16%,
-#111 16% 46%,
-#777 46% 50%,
-#111 50% 80%,
-#777 80% 84%,
-#111 84%);
-box-shadow:
-0 10px 24px #000c,
-inset 0 0 0 3px #777;
-touch-action:none
-}
-
-#wheel:after{
-content:"";
-position:absolute;
-left:50%;
-top:50%;
-width:18px;
-height:70px;
-background:#222;
-border-radius:8px;
-transform:translate(-50%,-50%)
-}
-
-#pedals{
-position:fixed;
-z-index:30;
-right:18px;
-bottom:max(18px,env(safe-area-inset-bottom));
-display:flex;
-gap:13px;
-align-items:flex-end
-}
-
-.pedal{
-background:linear-gradient(#777,#252525);
-border:2px solid #999;
-box-shadow:
-0 8px 17px #000b,
-inset 0 0 0 3px #333;
-color:#eee;
-touch-action:none
-}
-
-.pedal.on{
-transform:translateY(8px);
-filter:brightness(.7)
-}
-
-#brake{
-width:67px;
-height:102px
-}
-
-#gas{
-width:58px;
-height:130px
-}
-
-#handbrake{
-position:fixed;
-z-index:30;
-right:18px;
-bottom:164px;
-background:#8d2929
-}
-
-#gear{
-position:fixed;
-z-index:30;
-left:50%;
-bottom:9px;
-transform:translateX(-50%);
-padding:6px 12px;
-border-radius:9px;
-font-size:17px;
-font-weight:1000
-}
-
-#setup{
-position:fixed;
-z-index:100;
-inset:0;
-background:#03070bd9;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:20px
-}
-
-#setupCard{
-max-width:560px;
-padding:22px;
-border-radius:18px;
-color:white
-}
-
-#token{
-width:100%;
-padding:12px;
-border-radius:9px;
-border:1px solid #ffffff44;
-margin:10px 0
-}
-
-#setupCard h2{
-margin-top:0
-}
-
-#setupCard p{
-line-height:1.35;
-color:#d9e7f3
-}
-
-#skip{
-background:#38434b
-}
-
-#toast{
-position:fixed;
-z-index:50;
-top:132px;
-left:50%;
-transform:translateX(-50%);
-padding:8px 12px;
-border-radius:10px;
-display:none
+ position:fixed;
+ z-index:21;
+ left:10px;
+ top:167px;
+ padding:6px 9px;
+ border-radius:9px;
+ font-size:10px
 }
 
 #progressWrap{
-position:fixed;
-z-index:22;
-left:50%;
-top:58px;
-transform:translateX(-50%);
-width:min(420px,58vw);
-height:5px;
-background:#ffffff2b;
-border-radius:10px;
-overflow:hidden
+ position:fixed;
+ z-index:22;
+ left:50%;
+ top:58px;
+ transform:translateX(-50%);
+ width:min(420px,58vw);
+ height:5px;
+ background:#ffffff2b;
+ border-radius:10px;
+ overflow:hidden
 }
 
 #progress{
-height:100%;
-width:0;
-background:#23d8ff
+ height:100%;
+ width:0;
+ background:#23d8ff
 }
 
-#assist{
-position:fixed;
-z-index:30;
-right:252px;
-bottom:164px;
-background:#24643c
-}
-
-#assist.off{
-background:#555
-}
-
-#brakeGlow{
-position:fixed;
-z-index:18;
-left:50%;
-bottom:14.5%;
-transform:translateX(-50%);
-width:66px;
-height:10px;
-border-radius:50%;
-background:#ff1d1d;
-filter:blur(7px);
-opacity:0;
-pointer-events:none
-}
-
-#driveMode{
-position:fixed;
-z-index:30;
-left:50%;
-bottom:48px;
-transform:translateX(-50%);
-padding:7px 11px;
-border-radius:10px;
-font-size:11px
-}
-
-#miniNav{
-position:fixed;
-z-index:19;
-right:10px;
-top:202px;
-width:150px;
-height:92px;
-border-radius:13px;
-overflow:hidden;
-pointer-events:none
-}
-
-#miniRoad{
-position:absolute;
-left:72px;
-top:-25px;
-width:7px;
-height:150px;
-background:#21d8ff;
-box-shadow:0 0 9px #21d8ff;
-transform-origin:50% 75%
-}
-
-#miniCar{
-position:absolute;
-left:68px;
-bottom:10px;
-width:15px;
-height:26px;
-border-radius:6px;
-background:#f4c400;
-border:1px solid white
-}
-
-#quality{
-position:fixed;
-z-index:30;
-left:10px;
-top:200px;
-background:#35485c
-}
-
-#reset{
-position:fixed;
-z-index:30;
-left:82px;
-top:200px;
-background:#6a3d24
-}
-
-#fps{
-position:fixed;
-z-index:20;
-left:10px;
-top:241px;
-padding:5px 8px;
-border-radius:8px;
-font-size:10px
-}
-
-@media(max-width:650px){
+/* S7 FE steering wheel */
 
 #wheel{
-width:122px;
-height:122px;
-border-width:11px
+ position:fixed;
+ z-index:30;
+ left:28px;
+ bottom:28px;
+ width:150px;
+ height:150px;
+ border:13px solid #151515;
+ border-radius:50%;
+ background:
+ radial-gradient(circle,#333 0 19%,transparent 20%),
+ conic-gradient(
+ #111 0 12%,
+ #777 12% 16%,
+ #111 16% 46%,
+ #777 46% 50%,
+ #111 50% 80%,
+ #777 80% 84%,
+ #111 84%);
+ box-shadow:
+ 0 10px 24px #000c,
+ inset 0 0 0 3px #777;
+ touch-action:none
 }
+
+#wheel:after{
+ content:"";
+ position:absolute;
+ left:50%;
+ top:50%;
+ width:18px;
+ height:70px;
+ background:#222;
+ border-radius:8px;
+ transform:translate(-50%,-50%)
+}
+
+/* Pedals */
 
 #pedals{
-right:10px
+ position:fixed;
+ z-index:30;
+ right:28px;
+ bottom:28px;
+ display:flex;
+ gap:13px;
+ align-items:flex-end
 }
 
-#nav{
-top:125px
+.pedal{
+ background:linear-gradient(#777,#252525);
+ border:2px solid #999;
+ box-shadow:
+ 0 8px 17px #000b,
+ inset 0 0 0 3px #333;
+ color:#eee;
+ touch-action:none
 }
 
-#status{
-top:166px
+.pedal.on{
+ transform:translateY(8px);
+ filter:brightness(.7)
 }
 
-#assist{
-right:auto;
-left:155px;
-bottom:20px;
-font-size:10px;
-padding:8px
+#brake{
+ width:78px;
+ height:112px
 }
 
-#camera{
-right:98px!important;
-bottom:160px!important
+#gas{
+ width:68px;
+ height:145px
+}
+
+#handbrake{
+ position:fixed;
+ z-index:30;
+ right:18px;
+ bottom:180px;
+ background:#8d2929
 }
 
 #lights{
-right:18px!important;
-bottom:160px!important
+ position:fixed;
+ z-index:30;
+ right:92px;
+ bottom:180px;
+ background:#35485c
 }
 
-#miniNav{
-display:none
+#camera{
+ position:fixed;
+ z-index:30;
+ right:174px;
+ bottom:180px;
+ background:#35485c
 }
 
-#quality{
-top:205px
+#assist{
+ position:fixed;
+ z-index:30;
+ right:252px;
+ bottom:180px;
+ background:#24643c
 }
 
-#reset{
-top:205px
+#assist.off{
+ background:#555
 }
 
-#fps{
-top:244px
+#gear{
+ position:fixed;
+ z-index:30;
+ left:50%;
+ bottom:9px;
+ transform:translateX(-50%);
+ padding:6px 12px;
+ border-radius:9px;
+ font-size:17px;
+ font-weight:1000
 }
 
 #driveMode{
-bottom:4px;
-font-size:9px
+ position:fixed;
+ z-index:30;
+ left:50%;
+ bottom:48px;
+ transform:translateX(-50%);
+ padding:7px 11px;
+ border-radius:10px;
+ font-size:11px
 }
 
+#quality{
+ position:fixed;
+ z-index:30;
+ left:10px;
+ top:200px;
+ background:#35485c
 }
 
+#reset{
+ position:fixed;
+ z-index:30;
+ left:92px;
+ top:200px;
+ background:#6a3d24
+}
+
+#fps{
+ position:fixed;
+ z-index:20;
+ left:10px;
+ top:241px;
+ padding:5px 8px;
+ border-radius:8px;
+ font-size:10px
+}
+
+#hdBadge{
+ position:fixed;
+ z-index:20;
+ left:10px;
+ top:273px;
+ padding:5px 8px;
+ border-radius:8px;
+ font-size:10px
+}
+
+#brakeGlow{
+ position:fixed;
+ z-index:18;
+ left:50%;
+ bottom:14.5%;
+ transform:translateX(-50%);
+ width:66px;
+ height:10px;
+ border-radius:50%;
+ background:#ff1d1d;
+ filter:blur(7px);
+ opacity:0;
+ pointer-events:none
+}
+
+#toast{
+ position:fixed;
+ z-index:50;
+ top:132px;
+ left:50%;
+ transform:translateX(-50%);
+ padding:8px 12px;
+ border-radius:10px;
+ display:none
+}
+
+#setup{
+ position:fixed;
+ z-index:100;
+ inset:0;
+ background:#03070bd9;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px
+}
+
+#setupCard{
+ max-width:560px;
+ padding:22px;
+ border-radius:18px;
+ color:white
+}
+
+#setupCard h2{
+ margin-top:0
+}
+
+#setupCard p{
+ line-height:1.35;
+ color:#d9e7f3
+}
+
+#token{
+ width:100%;
+ padding:12px;
+ border-radius:9px;
+ border:1px solid #ffffff44;
+ margin:10px 0
+}
+
+#skip{
+ background:#38434b
+}
+
+#landscapeTip{
+ display:none;
+ position:fixed;
+ z-index:90;
+ inset:0;
+ background:#03070bea;
+ color:white;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding:35px;
+ font-size:22px;
+ font-weight:900
+}
+
+@media(orientation:portrait) and (max-width:900px){
+ #landscapeTip{
+  display:flex
+ }
+}
 </style>
 </head>
 
@@ -456,79 +407,47 @@ font-size:9px
 
 <div id="world"></div>
 
+<div id="landscapeTip">
+↻ Rotate your Galaxy Tab S7 FE to landscape
+</div>
+
 <div id="search" class="glass">
-
-<input
-id="q"
-placeholder="Search any real place">
-
-<button id="go">
-GPS
-</button>
-
-<button id="loc">
-⌖
-</button>
-
+ <input id="q" placeholder="Search any real place">
+ <button id="go">GPS</button>
+ <button id="loc">⌖</button>
 </div>
 
 <div id="dash" class="glass">
-
-<div id="speed">
-0
-</div>
-
-<small>
-km/h
-</small>
-
-<div id="road">
-<small>Abu Dhabi</small>
-</div>
-
+ <div id="speed">0</div>
+ <small>km/h</small>
+ <div id="road"><small>Abu Dhabi</small></div>
 </div>
 
 <div id="nav" class="glass">
-
-<div id="turn">
-Search for a destination
-</div>
-
-<div id="distance">
-3D navigation ready
-</div>
-
-<small id="eta"></small>
-
+ <div id="turn">Search for a destination</div>
+ <div id="distance">3D navigation ready</div>
+ <small id="eta"></small>
 </div>
 
 <div id="progressWrap">
-<div id="progress"></div>
+ <div id="progress"></div>
 </div>
 
 <div id="status" class="glass">
-CESIUM 3D • FREE MODE
+ CESIUM 3D • S7 FE HD
 </div>
 
-<div id="miniNav" class="glass">
-<div id="miniRoad"></div>
-<div id="miniCar"></div>
-</div>
+<button id="quality">S7 FE HD</button>
+<button id="reset">RESET</button>
 
-<button id="quality">
-QUALITY
-</button>
+<div id="fps" class="glass">60 FPS</div>
 
-<button id="reset">
-RESET
-</button>
-
-<div id="fps" class="glass">
-60 FPS
+<div id="hdBadge" class="glass">
+ S7 FE • HD • LANDSCAPE
 </div>
 
 <div id="driveMode" class="glass">
-SPORT • ABS • TRACTION CONTROL
+ SPORT • ABS • TRACTION CONTROL
 </div>
 
 <div id="brakeGlow"></div>
@@ -536,109 +455,58 @@ SPORT • ABS • TRACTION CONTROL
 <div id="wheel"></div>
 
 <div id="pedals">
-
-<button
-id="brake"
-class="pedal">
-BRAKE
-</button>
-
-<button
-id="gas"
-class="pedal">
-GAS
-</button>
-
+ <button id="brake" class="pedal">BRAKE</button>
+ <button id="gas" class="pedal">GAS</button>
 </div>
 
-<button id="handbrake">
-P
-</button>
+<button id="handbrake">P</button>
+<button id="lights">LIGHTS</button>
+<button id="camera">CAM</button>
+<button id="assist">ROAD ASSIST</button>
 
-<button
-id="lights"
-style="
-position:fixed;
-z-index:30;
-right:92px;
-bottom:164px;
-background:#35485c">
-LIGHTS
-</button>
-
-<button
-id="camera"
-style="
-position:fixed;
-z-index:30;
-right:174px;
-bottom:164px;
-background:#35485c">
-CAM
-</button>
-
-<button id="assist">
-ROAD ASSIST
-</button>
-
-<div id="gear" class="glass">
-D1
-</div>
+<div id="gear" class="glass">D1</div>
 
 <div id="toast" class="glass"></div>
 
 <div id="setup">
+ <div id="setupCard" class="glass">
 
-<div
-id="setupCard"
-class="glass">
+  <h2>World Drive 3D</h2>
 
-<h2>
-World Drive 3D
-</h2>
+  <p>
+  Optimized for the Samsung Galaxy Tab S7 FE.
+  For global terrain and OpenStreetMap 3D buildings,
+  enter a free Cesium ion token.
+  </p>
 
-<p>
-This is the Cesium 3D engine.
-For global terrain and 3D OSM buildings,
-paste your Cesium ion token.
-The token is stored only in this browser.
-You can also start the basic globe mode.
-</p>
+  <input id="token"
+  placeholder="Cesium ion token (optional)">
 
-<input
-id="token"
-placeholder="Paste free Cesium ion token (optional)">
+  <button id="start">START FULL 3D</button>
+  <button id="skip">START BASIC</button>
 
-<button id="start">
-START FULL 3D
-</button>
-
-<button id="skip">
-START BASIC
-</button>
-
-</div>
+ </div>
 </div>
 
 <script>
 
-const $ =
-x => document.getElementById(x);
+const $=id=>document.getElementById(id);
 
 let viewer;
 let car;
 let carParts=[];
+
 let routeEntity;
 let destMarker;
 
 let pos={
-lng:54.3773,
-lat:24.4539
+ lng:54.3773,
+ lat:24.4539
 };
 
 let heading=35;
-let speed=0;
 
+let speed=0;
 let steer=0;
 let gas=0;
 let brake=0;
@@ -646,22 +514,11 @@ let handbrake=0;
 
 let reverse=false;
 let lightsOn=false;
-
 let cameraMode=0;
 let roadAssist=true;
 
 let smoothedGas=0;
 let smoothedBrake=0;
-
-let qualityMode=0;
-
-let lastSafe={
-lng:54.3773,
-lat:24.4539
-};
-
-let fpsFrames=0;
-let fpsStamp=performance.now();
 
 let route=[];
 let steps=[];
@@ -675,1924 +532,1792 @@ let lastReroute=0;
 
 let cameraHeading=35;
 
+let lastSafe={
+ lng:54.3773,
+ lat:24.4539
+};
+
+let fpsFrames=0;
+let fpsStamp=performance.now();
+
+let groundZ=3.2;
+let terrainTick=0;
+
 const R=6378137;
 
-const rad=
-x=>x*Math.PI/180;
+const rad=x=>x*Math.PI/180;
+const deg=x=>x*180/Math.PI;
 
-const deg=
-x=>x*180/Math.PI;
 
+/* DISTANCE */
 
 function dist(a,b){
 
-let p1=rad(a.lat);
-let p2=rad(b.lat);
+ let p1=rad(a.lat);
+ let p2=rad(b.lat);
 
-let dp=p2-p1;
-let dl=rad(b.lng-a.lng);
+ let dp=p2-p1;
+ let dl=rad(b.lng-a.lng);
 
-let h=
-Math.sin(dp/2)**2+
-Math.cos(p1)*
-Math.cos(p2)*
-Math.sin(dl/2)**2;
+ let h=
+ Math.sin(dp/2)**2+
+ Math.cos(p1)*
+ Math.cos(p2)*
+ Math.sin(dl/2)**2;
 
-return 6371000*
-2*
-Math.asin(Math.sqrt(h));
-
+ return 6371000*
+ 2*
+ Math.asin(Math.sqrt(h));
 }
 
 
-function move(p,b,m){
+/* MOVE GPS POSITION */
 
-let d=m/R;
-let br=rad(b);
+function move(p,bearing,meters){
 
-let p1=rad(p.lat);
-let l1=rad(p.lng);
+ let d=meters/R;
+ let br=rad(bearing);
 
-let p2=
-Math.asin(
-Math.sin(p1)*Math.cos(d)+
-Math.cos(p1)*
-Math.sin(d)*
-Math.cos(br)
-);
+ let p1=rad(p.lat);
+ let l1=rad(p.lng);
 
-let l2=
-l1+
-Math.atan2(
-Math.sin(br)*
-Math.sin(d)*
-Math.cos(p1),
-Math.cos(d)-
-Math.sin(p1)*
-Math.sin(p2)
-);
+ let p2=Math.asin(
+  Math.sin(p1)*Math.cos(d)+
+  Math.cos(p1)*Math.sin(d)*Math.cos(br)
+ );
 
-return{
-lat:deg(p2),
-lng:deg(l2)
-};
+ let l2=l1+
+ Math.atan2(
+  Math.sin(br)*Math.sin(d)*Math.cos(p1),
+  Math.cos(d)-Math.sin(p1)*Math.sin(p2)
+ );
 
+ return{
+  lat:deg(p2),
+  lng:deg(l2)
+ };
 }
 
 
-function toast(s){
+/* MESSAGE */
 
-$("toast").textContent=s;
-$("toast").style.display="block";
+function toast(message){
 
-setTimeout(
-()=>$("toast").style.display="none",
-1700
-);
+ $("toast").textContent=message;
+ $("toast").style.display="block";
 
+ setTimeout(()=>{
+  $("toast").style.display="none";
+ },1700);
 }
 
+
+/* START CESIUM */
 
 async function boot(full){
 
-$("setup").style.display="none";
+ $("setup").style.display="none";
 
-let token=
-$("token").value.trim()||
-localStorage.getItem("wd3d-ion")||
-"";
+ let token=
+ $("token").value.trim() ||
+ localStorage.getItem("wd3d-ion") ||
+ "";
 
-if(token){
+ if(token){
 
-Cesium.Ion.defaultAccessToken=token;
+  Cesium.Ion.defaultAccessToken=token;
+  localStorage.setItem("wd3d-ion",token);
 
-localStorage.setItem(
-"wd3d-ion",
-token
-);
+ }
 
-}
+ viewer=new Cesium.Viewer("world",{
 
-viewer=
-new Cesium.Viewer(
-"world",
-{
+  animation:false,
+  timeline:false,
+  baseLayerPicker:false,
+  geocoder:false,
+  homeButton:false,
+  sceneModePicker:false,
+  navigationHelpButton:false,
+  fullscreenButton:false,
+  selectionIndicator:false,
+  infoBox:false,
+  shouldAnimate:true
 
-animation:false,
-timeline:false,
-baseLayerPicker:false,
-geocoder:false,
-homeButton:false,
-sceneModePicker:false,
-navigationHelpButton:false,
-fullscreenButton:false,
-selectionIndicator:false,
-infoBox:false,
-shouldAnimate:true
+ });
 
-}
-);
+ viewer.scene.globe.enableLighting=true;
 
-viewer.scene.globe.enableLighting=true;
+ viewer.scene.globe.depthTestAgainstTerrain=false;
 
-viewer.scene.globe.depthTestAgainstTerrain=true;
+ viewer.resolutionScale=
+ Math.min(window.devicePixelRatio||1,1.65);
 
-viewer.scene.screenSpaceCameraController.enableInputs=false;
+ viewer.scene.fxaa=true;
 
+ viewer.scene.globe.maximumScreenSpaceError=1.4;
 
-if(full && token){
-
-try{
-
-viewer.terrainProvider=
-await Cesium.createWorldTerrainAsync({
-requestVertexNormals:true
-});
-
-let buildings=
-await Cesium.createOsmBuildingsAsync();
-
-viewer.scene.primitives.add(buildings);
-
-$("status").textContent=
-"CESIUM 3D • TERRAIN • 3D BUILDINGS";
-
-}
-
-catch(e){
-
-toast(
-"3D assets unavailable — basic globe loaded"
-);
-
-}
-
-}
+ viewer.scene.screenSpaceCameraController.enableInputs=false;
 
 
-const root=
-Cesium.Cartesian3.fromDegrees(
-pos.lng,
-pos.lat,
-2
-);
+ /* TERRAIN + BUILDINGS */
+
+ if(full && token){
+
+  try{
+
+   viewer.terrainProvider=
+   await Cesium.createWorldTerrainAsync({
+    requestVertexNormals:true
+   });
+
+   const buildings=
+   await Cesium.createOsmBuildingsAsync();
+
+   viewer.scene.primitives.add(buildings);
+
+   toast("Full 3D loaded");
+
+  }
+
+  catch(e){
+
+   toast("Starting standard 3D");
+
+  }
+
+ }
 
 
-car=
-viewer.entities.add({
+ /* CAR */
 
-position:root,
-
-orientation:
-Cesium.Transforms.headingPitchRollQuaternion(
-root,
-new Cesium.HeadingPitchRoll(
-rad(heading),
-0,
-0
-)
-)
-
-});
+ createCar();
 
 
-const addPart=
-(offset,dim,color)=>{
+ /* ROUTE */
 
-let e=
-viewer.entities.add({
+ routeEntity=
+ viewer.entities.add({
 
-position:root,
+  polyline:{
 
-orientation:car.orientation,
+   positions:[],
 
-box:{
+   width:9,
 
-dimensions:
-new Cesium.Cartesian3(
-...dim
-),
+   material:
+   new Cesium.PolylineGlowMaterialProperty({
 
-material:
-Cesium.Color.fromCssColorString(
-color
-),
+    glowPower:.28,
+    color:Cesium.Color.CYAN
 
-outline:false
+   }),
+
+   clampToGround:true
+
+  }
+
+ });
+
+
+ requestAnimationFrame(loop);
 
 }
 
-});
 
-e._carOffset=offset;
+/* CREATE SPORTS CAR */
 
-carParts.push(e);
+function createCar(){
 
-return e;
+ let root=
+ Cesium.Cartesian3.fromDegrees(
+  pos.lng,
+  pos.lat,
+  3.2
+ );
 
-};
+ car=
+ viewer.entities.add({
 
+  position:root,
 
-// CAR BODY
+  orientation:
+  Cesium.Transforms.headingPitchRollQuaternion(
 
-addPart(
-[0,0,.45],
-[2.02,4.55,.72],
-"#f4c400"
-);
+   root,
 
-addPart(
-[0,-.28,1.00],
-[1.72,2.15,.68],
-"#d7ad00"
-);
+   new Cesium.HeadingPitchRoll(
+    rad(heading),
+    0,
+    0
+   )
 
-addPart(
-[0,1.38,.78],
-[1.88,1.45,.38],
-"#f8d22b"
-);
+  )
 
-addPart(
-[0,-1.70,.68],
-[1.90,.42,.42],
-"#151515"
-);
+ });
 
 
-// GLASS
+ function addPart(offset,dimensions,color){
 
-addPart(
-[0,-.35,1.20],
-[1.55,1.38,.12],
-"#173344"
-);
+  let entity=
+  viewer.entities.add({
 
+   position:root,
 
-// WHEELS
+   orientation:car.orientation,
 
-[
-[-.92,1.35,.35],
-[.92,1.35,.35],
-[-.92,-1.35,.35],
-[.92,-1.35,.35]
-]
-.forEach(
-o=>
-addPart(
-o,
-[.28,.72,.72],
-"#111111"
-)
-);
+   box:{
 
+    dimensions:
+    new Cesium.Cartesian3(
+     dimensions[0]*1.45,
+     dimensions[1]*1.45,
+     dimensions[2]*1.25
+    ),
 
-// TAIL LIGHTS
+    material:
+    Cesium.Color.fromCssColorString(color),
 
-addPart(
-[-.66,-2.02,.72],
-[.42,.10,.15],
-"#ff2020"
-);
+    outline:false
 
-addPart(
-[.66,-2.02,.72],
-[.42,.10,.15],
-"#ff2020"
-);
+   }
+
+  });
+
+  entity._carOffset=offset;
+
+  carParts.push(entity);
+
+  return entity;
+
+ }
 
 
-// HEADLIGHTS
+ /* YELLOW SPORTS COUPE */
 
-addPart(
-[-.62,2.05,.68],
-[.48,.10,.13],
-"#fff7d0"
-);
+ addPart(
+  [0,0,.45],
+  [2.02,4.55,.72],
+  "#ffd400"
+ );
 
-addPart(
-[.62,2.05,.68],
-[.48,.10,.13],
-"#fff7d0"
-);
+ addPart(
+  [0,-.28,1],
+  [1.72,2.15,.68],
+  "#e6b900"
+ );
 
+ addPart(
+  [0,1.38,.78],
+  [1.88,1.45,.38],
+  "#ffe24a"
+ );
 
-// SPOILER
-
-addPart(
-[0,-2.16,.98],
-[1.48,.16,.08],
-"#222222"
-);
-
-
-// FRONT GRILLE
-
-addPart(
-[0,2.10,.53],
-[1.45,.13,.16],
-"#111111"
-);
+ addPart(
+  [0,-1.70,.68],
+  [1.90,.42,.42],
+  "#151515"
+ );
 
 
-routeEntity=
-viewer.entities.add({
+ /* WINDOWS */
 
-polyline:{
+ addPart(
+  [0,-.35,1.20],
+  [1.55,1.38,.12],
+  "#0b2233"
+ );
 
-positions:[],
 
-width:9,
+ /* WHEELS */
 
-material:
-new Cesium.PolylineGlowMaterialProperty({
+ [
+ [-.92,1.35,.35],
+ [.92,1.35,.35],
+ [-.92,-1.35,.35],
+ [.92,-1.35,.35]
+ ]
 
-glowPower:.28,
-color:Cesium.Color.CYAN
+ .forEach(offset=>{
 
-}),
+  addPart(
+   offset,
+   [.28,.72,.72],
+   "#111111"
+  );
 
-clampToGround:true
+ });
+
+
+ /* REAR LIGHTS */
+
+ addPart(
+  [-.66,-2.02,.72],
+  [.42,.10,.15],
+  "#ff2020"
+ );
+
+ addPart(
+  [.66,-2.02,.72],
+  [.42,.10,.15],
+  "#ff2020"
+ );
+
+
+ /* HEADLIGHTS */
+
+ addPart(
+  [-.62,2.05,.68],
+  [.48,.10,.13],
+  "#fff7d0"
+ );
+
+ addPart(
+  [.62,2.05,.68],
+  [.48,.10,.13],
+  "#fff7d0"
+ );
+
+
+ /* SPOILER */
+
+ addPart(
+  [0,-2.16,.98],
+  [1.48,.16,.08],
+  "#222222"
+ );
+
+
+ /* GRILLE */
+
+ addPart(
+  [0,2.10,.53],
+  [1.45,.13,.16],
+  "#111111"
+ );
 
 }
 
-});
+
+$("start").onclick=()=>boot(true);
+$("skip").onclick=()=>boot(false);
 
 
-requestAnimationFrame(loop);
-
-}
-
-
-$("start").onclick=
-()=>boot(true);
-
-$("skip").onclick=
-()=>boot(false);
-
-
+/* SEARCH REAL LOCATION */
 
 async function search(){
 
-let q=
-$("q").value.trim();
+ let q=$("q").value.trim();
 
-if(!q)return;
+ if(!q)return;
 
-toast("Searching…");
+ toast("Searching…");
 
-try{
+ try{
 
-let r=
-await fetch(
+  let response=
+  await fetch(
+   "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q="+
+   encodeURIComponent(q)
+  );
 
-"https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q="+
-encodeURIComponent(q)
+  let result=
+  await response.json();
 
-);
+  if(!result.length)
+   throw new Error();
 
-let j=
-await r.json();
+  destination={
+   lng:+result[0].lon,
+   lat:+result[0].lat
+  };
 
-if(!j.length)
-throw 0;
-
-
-destination={
-
-lng:+j[0].lon,
-lat:+j[0].lat
-
-};
-
-destName=
-j[0].display_name;
+  destName=
+  result[0].display_name;
 
 
-if(destMarker)
-viewer.entities.remove(destMarker);
+  if(destMarker)
+   viewer.entities.remove(destMarker);
 
 
-destMarker=
-viewer.entities.add({
+  destMarker=
+  viewer.entities.add({
 
-position:
-Cesium.Cartesian3.fromDegrees(
-destination.lng,
-destination.lat,
-3
-),
+   position:
+   Cesium.Cartesian3.fromDegrees(
+    destination.lng,
+    destination.lat,
+    3
+   ),
 
-point:{
+   point:{
 
-pixelSize:16,
+    pixelSize:16,
+    color:Cesium.Color.LIME,
+    outlineColor:Cesium.Color.WHITE,
+    outlineWidth:3
 
-color:
-Cesium.Color.LIME,
+   },
 
-outlineColor:
-Cesium.Color.WHITE,
+   label:{
 
-outlineWidth:3
+    text:"DESTINATION",
 
-},
+    font:"700 13px sans-serif",
 
-label:{
+    pixelOffset:
+    new Cesium.Cartesian2(
+     0,-25
+    ),
 
-text:"DESTINATION",
+    fillColor:
+    Cesium.Color.WHITE,
 
-font:"700 13px sans-serif",
+    showBackground:true,
 
-pixelOffset:
-new Cesium.Cartesian2(
-0,
--25
-),
+    backgroundColor:
+    new Cesium.Color(
+     0,0,0,.65
+    )
 
-fillColor:
-Cesium.Color.WHITE,
+   }
 
-showBackground:true,
-
-backgroundColor:
-new Cesium.Color(
-0,
-0,
-0,
-.65
-)
-
-}
-
-});
+  });
 
 
-await makeRoute(false);
+  await makeRoute(false);
 
-}
+ }
 
-catch(e){
+ catch(e){
 
-toast("Place not found");
+  toast("Place not found");
 
-}
+ }
 
 }
 
 
+/* REAL ROAD ROUTING */
 
-async function makeRoute(re=false){
+async function makeRoute(reroute=false){
 
-if(!destination)
-return;
+ if(!destination)return;
 
-try{
+ try{
 
-let u=
+  let url=
+  `https://router.project-osrm.org/route/v1/driving/${pos.lng},${pos.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&steps=true`;
 
-`https://router.project-osrm.org/route/v1/driving/${pos.lng},${pos.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&steps=true`;
+  let response=
+  await fetch(url);
 
+  let json=
+  await response.json();
 
-let r=
-await fetch(u);
-
-let j=
-await r.json();
-
-let rr=
-j.routes[0];
+  let result=json.routes[0];
 
 
-route=
-rr.geometry.coordinates.map(
+  route=
+  result.geometry.coordinates.map(c=>({
 
-c=>({
+   lng:c[0],
+   lat:c[1]
 
-lng:c[0],
-lat:c[1]
-
-})
-
-);
+  }));
 
 
-steps=
-rr.legs.flatMap(
-x=>x.steps||[]
-);
+  steps=
+  result.legs.flatMap(
+   leg=>leg.steps||[]
+  );
 
 
-routeI=0;
+  routeI=0;
 
 
-routeEntity.polyline.positions=
+  routeEntity.polyline.positions=
+  route.map(p=>
 
-route.map(
+   Cesium.Cartesian3.fromDegrees(
+    p.lng,
+    p.lat,
+    2
+   )
 
-p=>
-Cesium.Cartesian3.fromDegrees(
-p.lng,
-p.lat,
-2
-)
-
-);
+  );
 
 
-$("eta").textContent=
-
-(rr.distance/1000).toFixed(1)+
-" km • "+
-Math.round(rr.duration/60)+
-" min";
-
-
-$("road").innerHTML=
-
-"<small>"+
-destName.split(",")[0]+
-"</small>";
+  $("eta").textContent=
+  (result.distance/1000).toFixed(1)+
+  " km • "+
+  Math.round(result.duration/60)+
+  " min";
 
 
-toast(
-re?
-"Rerouted":
-"Route ready"
-);
+  $("road").innerHTML=
+  "<small>"+
+  destName.split(",")[0]+
+  "</small>";
 
-}
 
-catch(e){
+  toast(
+   reroute ?
+   "Rerouted" :
+   "Route ready"
+  );
 
-toast(
-"Routing unavailable"
-);
+ }
 
-}
+ catch(e){
+
+  toast("Routing unavailable");
+
+ }
 
 }
 
 
+/* FIND NEAREST ROUTE POINT */
 
 function nearest(){
 
-let bi=routeI;
-let bd=1e9;
+ let bestIndex=routeI;
+ let bestDistance=1e9;
 
+ for(
+  let i=Math.max(0,routeI-15);
+  i<Math.min(route.length,routeI+80);
+  i++
+ ){
 
-for(
-let i=Math.max(0,routeI-15);
-i<Math.min(route.length,routeI+80);
-i++
-){
+  let d=dist(
+   pos,
+   route[i]
+  );
 
-let d=
-dist(
-pos,
-route[i]
-);
+  if(d<bestDistance){
 
-if(d<bd){
+   bestDistance=d;
+   bestIndex=i;
 
-bd=d;
-bi=i;
+  }
 
-}
+ }
 
-}
+ routeI=bestIndex;
 
-
-routeI=bi;
-
-return bd;
+ return bestDistance;
 
 }
 
 
+/* GPS NAVIGATION */
 
 function nav(){
 
-if(!route.length)
-return;
+ if(!route.length)
+  return;
 
 
-let off=
-nearest();
+ let offRoute=
+ nearest();
 
-let left=0;
-let total=0;
 
+ let remaining=0;
+ let total=0;
 
-for(
-let i=1;
-i<route.length;
-i++
-)
 
-total+=
-dist(
-route[i-1],
-route[i]
-);
+ for(let i=1;i<route.length;i++){
 
+  total+=dist(
+   route[i-1],
+   route[i]
+  );
 
-for(
-let i=routeI+1;
-i<route.length;
-i++
-)
+ }
 
-left+=
-dist(
-route[i-1],
-route[i]
-);
 
+ for(
+  let i=routeI+1;
+  i<route.length;
+  i++
+ ){
 
-$("progress").style.width=
+  remaining+=dist(
+   route[i-1],
+   route[i]
+  );
 
-(
-total?
-Math.max(
-0,
-Math.min(
-100,
-(1-left/total)*100
-)
-):
-0
-)+"%";
+ }
 
 
-let bs=null;
-let bd=1e9;
+ let progress=
+ total ?
+ Math.max(
+  0,
+  Math.min(
+   100,
+   (1-remaining/total)*100
+  )
+ ) :
+ 0;
 
 
-for(let s of steps){
+ $("progress").style.width=
+ progress+"%";
 
-if(!s.maneuver?.location)
-continue;
 
+ let bestStep=null;
+ let bestDistance=1e9;
 
-let p={
 
-lng:s.maneuver.location[0],
-lat:s.maneuver.location[1]
+ for(let step of steps){
 
-};
+  if(!step.maneuver?.location)
+   continue;
 
 
-let d=
-dist(
-pos,
-p
-);
+  let p={
 
+   lng:step.maneuver.location[0],
+   lat:step.maneuver.location[1]
 
-if(
-d<bd &&
-d<1800
-){
+  };
 
-bd=d;
-bs=s;
 
-}
+  let d=
+  dist(pos,p);
 
-}
 
+  if(
+   d<bestDistance &&
+   d<1800
+  ){
 
-if(bs){
+   bestDistance=d;
+   bestStep=step;
 
-let m=
-bs.maneuver;
+  }
 
-let mod=
-m.modifier||"";
+ }
 
 
-let arrow=
+ if(bestStep){
 
-mod.includes("left")?
-"↰":
+  let maneuver=
+  bestStep.maneuver;
 
-mod.includes("right")?
-"↱":
+  let modifier=
+  maneuver.modifier||"";
 
-m.type==="roundabout"?
-"↻":
-"↑";
 
+  let arrow=
+  modifier.includes("left") ?
+  "↰" :
 
-$("miniRoad").style.transform=
+  modifier.includes("right") ?
+  "↱" :
 
-`rotate(${
-mod.includes("left")?
--24:
-mod.includes("right")?
-24:
-m.type==="roundabout"?
-40:
-0
-}deg)`;
+  maneuver.type==="roundabout" ?
+  "↻" :
+  "↑";
 
 
-$("turn").textContent=
+  $("turn").textContent=
 
-arrow+" "+
+  arrow+" "+
 
-(
-m.type==="arrive"?
-"Destination":
+  (
+   maneuver.type==="arrive" ?
+   "Destination" :
 
-m.type==="turn"?
-"Turn "+mod:
+   maneuver.type==="turn" ?
+   "Turn "+modifier :
 
-"Continue"
-)
+   "Continue"
+  )
 
-+
+  +
 
-(
-bs.name?
-" • "+bs.name:
-""
-);
+  (
+   bestStep.name ?
+   " • "+bestStep.name :
+   ""
+  );
 
 
-$("distance").textContent=
+  $("distance").textContent=
 
-(
-bd<1000?
-Math.round(bd)+" m":
-(bd/1000).toFixed(1)+" km"
-)
+  (
+   bestDistance<1000 ?
 
-+
+   Math.round(bestDistance)+" m" :
 
-" • "+
+   (bestDistance/1000).toFixed(1)+" km"
+  )
 
-(left/1000).toFixed(1)+
-" km left";
+  +
 
-}
+  " • "+
 
+  (remaining/1000).toFixed(1)+
+  " km left";
 
-if(left<20){
+ }
 
-$("turn").textContent=
-"🏁 Destination reached";
 
-speed=0;
+ if(remaining<20){
 
-}
+  $("turn").textContent=
+  "🏁 Destination reached";
 
+  speed=0;
 
-if(
-off>55 &&
-performance.now()-lastReroute>9000
-){
+ }
 
-lastReroute=
-performance.now();
 
-makeRoute(true);
+ if(
+  offRoute>55 &&
+  performance.now()-lastReroute>9000
+ ){
 
-}
+  lastReroute=
+  performance.now();
+
+  makeRoute(true);
+
+ }
 
 }
 
 
+/* GAME LOOP */
 
-function loop(t){
+function loop(time){
 
-if(!viewer)
-return;
+ if(!viewer)
+  return;
 
 
-let dt=
-Math.min(
-.04,
-(t-last)/1000
-);
+ let dt=
+ Math.min(
+  .04,
+  (time-last)/1000
+ );
 
-last=t;
+ last=time;
 
 
-// PEDAL SMOOTHING
+ smoothedGas+=
+ (gas-smoothedGas)*
+ Math.min(1,dt*7);
 
-smoothedGas+=
-(gas-smoothedGas)*
-Math.min(
-1,
-dt*7
-);
 
+ smoothedBrake+=
+ (brake-smoothedBrake)*
+ Math.min(1,dt*10);
 
-smoothedBrake+=
-(brake-smoothedBrake)*
-Math.min(
-1,
-dt*10
-);
 
+ let absSpeed=
+ Math.abs(speed);
 
-let absSp=
-Math.abs(speed);
 
+ let traction=
+ 1-
+ Math.min(
+  .28,
+  Math.abs(steer)*
+  absSpeed/
+  520
+ );
 
-let traction=
-1-
-Math.min(
-.28,
-Math.abs(steer)*
-absSp/
-520
-);
 
+ let acceleration=
 
-let acc=
+ reverse ?
+ -17 :
 
-reverse?
--17:
+ absSpeed<55 ?
+ 34 :
 
-absSp<55?
-34:
+ absSpeed<120 ?
+ 25 :
 
-absSp<120?
-25:
-16;
+ 16;
 
 
-// ACCELERATION
+ speed+=
+ smoothedGas*
+ acceleration*
+ traction*
+ dt;
 
-speed+=
-smoothedGas*
-acc*
-traction*
-dt;
 
+ let braking=
+ smoothedBrake*
+ (
+  absSpeed>8 ?
+  .92 :
+  1
+ );
 
-// BRAKING
 
-let absBrake=
-smoothedBrake*
-(
-absSp>8?
-.92:
-1
-);
+ speed-=
+ braking*
+ 64*
+ dt;
 
 
-speed-=
-absBrake*
-64*
-dt;
+ speed-=
+ handbrake*
+ 105*
+ dt;
 
 
-speed-=
-handbrake*
-105*
-dt;
+ speed-=
+ Math.max(
+  1.05,
+  absSpeed*.019
+ )*
+ Math.sign(speed||1)*
+ dt;
 
 
-// DRAG
+ speed=
+ Math.max(
+  -32,
+  Math.min(
+   205,
+   speed
+  )
+ );
 
-speed-=
 
-Math.max(
-1.05,
-absSp*.019
-)
+ if(
+  Math.abs(speed)<.2 &&
+  !gas
+ )
+ speed=0;
+
+
+ /* STEERING */
+
+ let sensitivity=
+ 45/
+ (1+Math.abs(speed)/58);
+
+
+ let steerCurve=
+ Math.sign(steer)*
+ Math.pow(
+  Math.abs(steer),
+  1.18
+ );
+
+
+ heading=
+ (
+  heading+
+  steerCurve*
+  sensitivity*
+  dt*
+  (
+   speed>=0 ?
+   1 :
+   -1
+  )
+  +360
+ )%360;
+
+
+ /* ROAD ASSIST */
+
+ if(
+  roadAssist &&
+  route.length &&
+  Math.abs(speed)>4
+ ){
 
-*
+  nearest();
 
-Math.sign(
-speed||1
-)
 
-*
+  let target=
+  route[
+   Math.min(
+    route.length-1,
+    routeI+
+    Math.max(
+     3,
+     Math.round(
+      Math.abs(speed)/18
+     )
+    )
+   )
+  ];
 
-dt;
 
+  if(target){
 
-speed=
-Math.max(
--32,
-Math.min(
-205,
-speed
-)
-);
+   let y=
+   Math.sin(
+    rad(target.lng-pos.lng)
+   )*
+   Math.cos(
+    rad(target.lat)
+   );
 
 
-if(
-Math.abs(speed)<.2 &&
-!gas
-)
+   let x=
+   Math.cos(rad(pos.lat))*
+   Math.sin(rad(target.lat))
+   -
+   Math.sin(rad(pos.lat))*
+   Math.cos(rad(target.lat))*
+   Math.cos(
+    rad(target.lng-pos.lng)
+   );
 
-speed=0;
 
+   let routeHeading=
+   (
+    deg(
+     Math.atan2(y,x)
+    )+
+    360
+   )%360;
 
-// STEERING
 
-let sens=
+   let difference=
+   (
+    (
+     routeHeading-
+     heading+
+     540
+    )%360
+   )-180;
 
-45/
-(
-1+
-Math.abs(speed)/58
-);
 
+   if(
+    Math.abs(difference)<38
+   ){
 
-let steerCurve=
+    heading=
+    (
+     heading+
+     difference*
+     Math.min(
+      .14,
+      dt*1.8
+     )+
+     360
+    )%360;
 
-Math.sign(steer)*
+   }
 
-Math.pow(
-Math.abs(steer),
-1.18
-);
+  }
 
+ }
 
-heading=
 
-(
-heading+
+ pos=
+ move(
+  pos,
+  heading,
+  (speed/3.6)*dt
+ );
 
-steerCurve*
-sens*
-dt*
-(
-speed>=0?
-1:
--1
-)
 
-+
+ if(
+  route.length &&
+  nearest()<30
+ ){
 
-360
+  lastSafe={...pos};
 
-)%360;
+ }
 
 
-// ROAD ASSIST
+ /* TERRAIN FOLLOWING */
 
-if(
-roadAssist &&
-route.length &&
-Math.abs(speed)>4
-){
+ terrainTick+=dt;
 
-nearest();
+ if(terrainTick>.18){
 
+  terrainTick=0;
 
-let target=
+  try{
 
-route[
+   const cartographic=
+   Cesium.Cartographic.fromDegrees(
+    pos.lng,
+    pos.lat
+   );
 
-Math.min(
 
-route.length-1,
+   const terrainHeight=
+   viewer.scene.globe.getHeight(
+    cartographic
+   );
 
-routeI+
 
-Math.max(
-3,
-Math.round(
-Math.abs(speed)/18
-)
-)
+   if(
+    Number.isFinite(
+     terrainHeight
+    )
+   ){
 
-)
+    groundZ+=
+    (
+     terrainHeight+
+     1.35-
+     groundZ
+    )*.35;
 
-];
+   }
 
+  }
 
-if(target){
+  catch(e){}
 
-let y=
+ }
 
-Math.sin(
-rad(
-target.lng-pos.lng
-)
-)
 
-*
+ $("brakeGlow").style.opacity=
+ (
+  smoothedBrake>.1 ||
+  handbrake
+ ) ?
+ .9 :
+ 0;
 
-Math.cos(
-rad(
-target.lat
-)
-);
 
+ /* FPS */
 
-let x=
+ fpsFrames++;
 
-Math.cos(
-rad(
-pos.lat
-)
-)
+ if(
+  time-fpsStamp>1000
+ ){
 
-*
+  $("fps").textContent=
+  Math.round(
+   fpsFrames*
+   1000/
+   (time-fpsStamp)
+  )+
+  " FPS";
 
-Math.sin(
-rad(
-target.lat
-)
-)
 
--
+  fpsFrames=0;
+  fpsStamp=time;
 
-Math.sin(
-rad(
-pos.lat
-)
-)
+ }
 
-*
 
-Math.cos(
-rad(
-target.lat
-)
-)
+ /* CAR POSITION */
 
-*
+ let carPosition=
+ Cesium.Cartesian3.fromDegrees(
+  pos.lng,
+  pos.lat,
+  groundZ
+ );
 
-Math.cos(
-rad(
-target.lng-pos.lng
-)
-);
 
+ let orientation=
+ Cesium.Transforms
+ .headingPitchRollQuaternion(
 
-let rh=
+  carPosition,
 
-(
-deg(
-Math.atan2(
-y,
-x
-)
-)
+  new Cesium.HeadingPitchRoll(
+   rad(heading),
+   0,
+   0
+  )
 
-+
+ );
 
-360
 
-)%360;
+ car.position=
+ carPosition;
 
+ car.orientation=
+ orientation;
 
-let diff=
 
-(
-(
-rh-heading+540
-)%360
-)-180;
+ /* MOVE CAR PARTS */
 
+ const enu=
+ Cesium.Transforms
+ .eastNorthUpToFixedFrame(
+  carPosition
+ );
 
-if(
-Math.abs(diff)<38
-)
 
-heading=
+ const h=
+ rad(heading);
 
-(
-heading+
+ const cs=
+ Math.cos(h);
 
-diff*
-Math.min(
-.14,
-dt*1.8
-)
+ const sn=
+ Math.sin(h);
 
-+
 
-360
+ for(
+  const entity of carParts
+ ){
 
-)%360;
+  let offset=
+  entity._carOffset;
 
-}
 
-}
+  let x=
+  offset[0]*cs+
+  offset[1]*sn;
 
 
-// MOVE CAR
+  let y=
+  -offset[0]*sn+
+  offset[1]*cs;
 
-pos=
-move(
-pos,
-heading,
-(speed/3.6)*dt
-);
 
+  let local=
+  new Cesium.Cartesian3(
+   x,
+   y,
+   offset[2]
+  );
 
-if(
-route.length &&
-nearest()<30
-)
 
-lastSafe={
-...pos
-};
+  let world=
+  Cesium.Matrix4
+  .multiplyByPoint(
+   enu,
+   local,
+   new Cesium.Cartesian3()
+  );
 
 
-// BRAKE LIGHT EFFECT
+  entity.position=
+  world;
 
-$("brakeGlow").style.opacity=
+  entity.orientation=
+  orientation;
 
-(
-smoothedBrake>.1 ||
-handbrake
-)?
-.9:
-0;
+ }
 
 
-// FPS
+ /* CAMERA SMOOTHING */
 
-fpsFrames++;
+ let angleDifference=
+ (
+  (
+   heading-
+   cameraHeading+
+   540
+  )%360
+ )-180;
 
 
-if(
-t-fpsStamp>1000
-){
+ cameraHeading=
+ (
+  cameraHeading+
+  angleDifference*
+  Math.min(
+   1,
+   dt*4.2
+  )+
+  360
+ )%360;
 
-$("fps").textContent=
 
-Math.round(
+ let speedZoom=
+ Math.min(
+  10,
+  Math.abs(speed)*.045
+ );
 
-fpsFrames*
-1000/
-(
-t-fpsStamp
-)
 
-)
+ let cameraDistance=
+ (
+  cameraMode===0 ?
+  12 :
 
-+
+  cameraMode===1 ?
+  6.5 :
 
-" FPS";
+  27
+ )
+ +
+ speedZoom;
 
 
-fpsFrames=0;
-fpsStamp=t;
+ let cameraHeight=
+ (
+  cameraMode===0 ?
+  5.4 :
 
-}
+  cameraMode===1 ?
+  3.7 :
 
+  12
+ )
+ +
+ Math.min(
+  4,
+  Math.abs(speed)*.018
+ );
 
-// CAR POSITION
 
-let cp=
+ let behind=
+ move(
+  pos,
+  (cameraHeading+180)%360,
+  cameraDistance+
+  Math.abs(speed)*.055
+ );
 
-Cesium.Cartesian3.fromDegrees(
-pos.lng,
-pos.lat,
-2
-);
 
+ let cameraPosition=
+ Cesium.Cartesian3.fromDegrees(
 
-let ori=
+  behind.lng,
+  behind.lat,
 
-Cesium.Transforms.headingPitchRollQuaternion(
+  groundZ+
+  cameraHeight+
+  Math.abs(speed)*.018
 
-cp,
+ );
 
-new Cesium.HeadingPitchRoll(
-rad(heading),
-0,
-0
-)
 
-);
+ viewer.camera.setView({
 
+  destination:
+  cameraPosition,
 
-car.position=cp;
-car.orientation=ori;
+  orientation:{
 
+   heading:
+   rad(cameraHeading),
 
-// MOVE CAR PARTS
+   pitch:
+   rad(
+    cameraMode===2 ?
+    -18 :
+    -9
+   ),
 
-const enu=
+   roll:0
 
-Cesium.Transforms.eastNorthUpToFixedFrame(
-cp
-);
+  }
 
+ });
 
-let h=
-rad(heading);
 
-let cs=
-Math.cos(h);
+ $("speed").textContent=
+ Math.round(
+  Math.abs(speed)
+ );
 
-let sn=
-Math.sin(h);
 
+ $("gear").textContent=
 
-for(
-const e of carParts
-){
+ reverse ?
+ "R" :
 
-let o=
-e._carOffset;
+ speed<1 ?
+ "D1" :
 
+ "D"+
+ Math.min(
+  8,
+  Math.ceil(
+   Math.abs(speed)/25
+  )
+ );
 
-let x=
-o[0]*cs+
-o[1]*sn;
 
+ nav();
 
-let y=
--o[0]*sn+
-o[1]*cs;
-
-
-let local=
-
-new Cesium.Cartesian3(
-x,
-y,
-o[2]
-);
-
-
-let world=
-
-Cesium.Matrix4.multiplyByPoint(
-
-enu,
-
-local,
-
-new Cesium.Cartesian3()
-
-);
-
-
-e.position=world;
-e.orientation=ori;
-
-}
-
-
-// CAMERA SMOOTHING
-
-cameraHeading+=
-
-(
-heading-cameraHeading
-)
-
-*
-
-Math.min(
-1,
-dt*4.2
-);
-
-
-let speedZoom=
-
-Math.min(
-10,
-Math.abs(speed)*.045
-);
-
-
-let camDist=
-
-(
-cameraMode===0?
-18:
-
-cameraMode===1?
-9:
-32
-)
-
-+
-
-speedZoom;
-
-
-let camHeight=
-
-(
-cameraMode===0?
-7.2:
-
-cameraMode===1?
-4:
-14
-)
-
-+
-
-Math.min(
-4,
-Math.abs(speed)*.018
-);
-
-
-let behind=
-
-move(
-
-pos,
-
-(cameraHeading+180)%360,
-
-camDist+
-Math.abs(speed)*.055
-
-);
-
-
-let cam=
-
-Cesium.Cartesian3.fromDegrees(
-
-behind.lng,
-behind.lat,
-camHeight+
-Math.abs(speed)*.018
-
-);
-
-
-viewer.camera.setView({
-
-destination:cam,
-
-orientation:{
-
-heading:
-rad(cameraHeading),
-
-pitch:
-rad(
-cameraMode===2?
--18:
--9
-),
-
-roll:0
-
-}
-
-});
-
-
-// DASHBOARD
-
-$("speed").textContent=
-Math.round(
-Math.abs(speed)
-);
-
-
-$("gear").textContent=
-
-reverse?
-"R":
-
-speed<1?
-"D1":
-
-"D"+
-
-Math.min(
-
-8,
-
-Math.ceil(
-Math.abs(speed)/25
-)
-
-);
-
-
-nav();
-
-requestAnimationFrame(loop);
+ requestAnimationFrame(loop);
 
 }
 
 
-// SEARCH
+/* SEARCH CONTROLS */
 
 $("go").onclick=
 search;
 
 
 $("q").addEventListener(
+ "keydown",
+ e=>{
 
-"keydown",
+  if(e.key==="Enter")
+   search();
 
-e=>
-e.key==="Enter" &&
-search()
-
+ }
 );
 
 
-// LOCATION
+/* GPS CURRENT LOCATION */
 
 $("loc").onclick=
+()=>{
 
-()=>navigator.geolocation?.
+ navigator.geolocation?.
+ getCurrentPosition(
 
-getCurrentPosition(
+  position=>{
 
-p=>{
+   pos={
 
-pos={
+    lng:
+    position.coords.longitude,
 
-lng:p.coords.longitude,
-lat:p.coords.latitude
+    lat:
+    position.coords.latitude
+
+   };
+
+   lastSafe={...pos};
+
+   toast("Location set");
+
+  },
+
+  ()=>toast(
+   "Location unavailable"
+  )
+
+ );
 
 };
 
-toast(
-"Location set"
-);
 
-},
-
-()=>toast(
-"Location unavailable"
-)
-
-);
-
-
-// STEERING WHEEL
+/* STEERING WHEEL */
 
 let wheel=
 $("wheel");
 
-let wa=false;
+let steeringActive=false;
 
 
-function wm(e){
+function wheelMove(e){
 
-if(!wa)
-return;
-
-
-let r=
-wheel.getBoundingClientRect();
+ if(!steeringActive)
+  return;
 
 
-let x=
-
-e.clientX-
-r.left-
-r.width/2;
+ let rect=
+ wheel.getBoundingClientRect();
 
 
-steer=
-
-Math.max(
-
--1,
-
-Math.min(
-
-1,
-
-x/
-(
-r.width*.4
-)
-
-)
-
-);
+ let x=
+ e.clientX-
+ rect.left-
+ rect.width/2;
 
 
-wheel.style.transform=
+ steer=
+ Math.max(
+  -1,
+  Math.min(
+   1,
+   x/
+   (rect.width*.4)
+  )
+ );
 
-`rotate(${steer*115}deg)`;
+
+ wheel.style.transform=
+ `rotate(${steer*115}deg)`;
 
 }
 
 
 wheel.onpointerdown=
-
 e=>{
 
-wa=true;
+ steeringActive=true;
 
-wheel.setPointerCapture(
-e.pointerId
-);
+ wheel.setPointerCapture(
+  e.pointerId
+ );
 
-wm(e);
+ wheelMove(e);
 
 };
 
 
 wheel.onpointermove=
-wm;
+wheelMove;
 
 
 wheel.onpointerup=
 wheel.onpointercancel=
-
 ()=>{
 
-wa=false;
-steer=0;
+ steeringActive=false;
 
-wheel.style.transition=
-".22s";
+ steer=0;
 
-wheel.style.transform=
-"rotate(0)";
+ wheel.style.transition=
+ ".22s";
 
-setTimeout(
+ wheel.style.transform=
+ "rotate(0)";
 
-()=>wheel.style.transition="",
-
-230
-
-);
-
-};
-
-
-// PEDALS
-
-function pedal(id,set){
-
-let e=$(id);
-
-
-e.onpointerdown=
-
-x=>{
-
-x.preventDefault();
-
-e.setPointerCapture(
-x.pointerId
-);
-
-e.classList.add(
-"on"
-);
-
-set(1);
+ setTimeout(
+  ()=>{
+   wheel.style.transition="";
+  },
+  230
+ );
 
 };
 
 
-e.onpointerup=
-e.onpointercancel=
+/* PEDALS */
 
-()=>{
+function setupPedal(
+ id,
+ setter
+){
 
-e.classList.remove(
-"on"
-);
+ let element=$(id);
 
-set(0);
 
-};
+ element.onpointerdown=
+ e=>{
+
+  e.preventDefault();
+
+  element.setPointerCapture(
+   e.pointerId
+  );
+
+  element.classList.add(
+   "on"
+  );
+
+  setter(1);
+
+ };
+
+
+ element.onpointerup=
+ element.onpointercancel=
+ ()=>{
+
+  element.classList.remove(
+   "on"
+  );
+
+  setter(0);
+
+ };
 
 }
 
 
-pedal(
-"gas",
-v=>gas=v
+setupPedal(
+ "gas",
+ value=>gas=value
 );
 
 
-pedal(
-"brake",
-v=>brake=v
+setupPedal(
+ "brake",
+ value=>brake=value
 );
 
 
-// HANDBRAKE
+/* HANDBRAKE */
 
 $("handbrake").onpointerdown=
-
 e=>{
 
-e.preventDefault();
+ e.preventDefault();
 
-handbrake=1;
+ handbrake=1;
 
-$("handbrake").style.transform=
-"translateY(5px)";
+ $("handbrake").style.transform=
+ "translateY(5px)";
 
 };
 
 
 $("handbrake").onpointerup=
 $("handbrake").onpointercancel=
-
 ()=>{
 
-handbrake=0;
+ handbrake=0;
 
-$("handbrake").style.transform="";
+ $("handbrake").style.transform="";
 
 };
 
 
-// GEAR
+/* REVERSE */
 
 $("gear").onclick=
-
 ()=>{
 
-if(
-Math.abs(speed)<2
-){
+ if(
+  Math.abs(speed)<2
+ ){
 
-reverse=!reverse;
+  reverse=!reverse;
 
-$("gear").textContent=
+  $("gear").textContent=
+  reverse ?
+  "R" :
+  "D1";
 
-reverse?
-"R":
-"D1";
 
-toast(
+  toast(
+   reverse ?
+   "Reverse" :
+   "Drive"
+  );
 
-reverse?
-"Reverse":
-"Drive"
+ }
 
-);
+ else{
 
-}
+  toast(
+   "Stop before changing direction"
+  );
 
-else{
-
-toast(
-"Stop before changing direction"
-);
-
-}
+ }
 
 };
 
 
-// CAMERA
+/* CAMERA */
 
 $("camera").onclick=
-
 ()=>{
 
-cameraMode=
-(cameraMode+1)%3;
+ cameraMode=
+ (cameraMode+1)%3;
 
-toast(
 
-[
-"Chase camera",
-"Close camera",
-"Wide camera"
-][cameraMode]
-
-);
+ toast(
+  [
+   "Chase camera",
+   "Close camera",
+   "Wide camera"
+  ][cameraMode]
+ );
 
 };
 
 
-// LIGHTING
+/* LIGHTING */
 
 $("lights").onclick=
-
 ()=>{
 
-lightsOn=
-!lightsOn;
-
-$("lights").style.background=
-
-lightsOn?
-"#c79b13":
-"#35485c";
+ lightsOn=
+ !lightsOn;
 
 
-viewer.scene.globe.enableLighting=
-lightsOn;
+ $("lights").style.background=
+ lightsOn ?
+ "#c79b13" :
+ "#35485c";
 
 
-toast(
+ viewer.scene.globe.enableLighting=
+ lightsOn;
 
-lightsOn?
-"Night lighting ON":
-"Night lighting OFF"
 
-);
+ toast(
+  lightsOn ?
+  "Night lighting ON" :
+  "Night lighting OFF"
+ );
 
 };
 
 
-// ROAD ASSIST
+/* ROAD ASSIST */
 
 $("assist").onclick=
-
 ()=>{
 
-roadAssist=
-!roadAssist;
+ roadAssist=
+ !roadAssist;
 
 
-$("assist").classList.toggle(
-
-"off",
-
-!roadAssist
-
-);
+ $("assist").classList.toggle(
+  "off",
+  !roadAssist
+ );
 
 
-$("assist").textContent=
+ $("assist").textContent=
+ roadAssist ?
+ "ROAD ASSIST" :
+ "FREE DRIVE";
 
-roadAssist?
-"ROAD ASSIST":
-"FREE DRIVE";
 
-
-toast(
-
-roadAssist?
-"Gentle road assist ON":
-"Free driving ON"
-
-);
+ toast(
+  roadAssist ?
+  "Gentle road assist ON" :
+  "Free driving ON"
+ );
 
 };
 
 
-// GRAPHICS QUALITY
+/* GRAPHICS */
+
+let qualityMode=2;
+
 
 $("quality").onclick=
-
 ()=>{
 
-qualityMode=
-(qualityMode+1)%3;
+ qualityMode=
+ (qualityMode+1)%3;
 
 
-let labels=[
-
-"AUTO",
-"PERFORMANCE",
-"QUALITY"
-
-];
+ const labels=[
+  "AUTO",
+  "PERFORMANCE",
+  "S7 FE HD"
+ ];
 
 
-let ratios=[
+ const ratios=[
 
-Math.min(
-devicePixelRatio,
-1.5
-),
+  Math.min(
+   devicePixelRatio,
+   1.5
+  ),
 
-1,
+  1,
 
-Math.min(
-devicePixelRatio,
-2
-)
+  Math.min(
+   devicePixelRatio,
+   1.65
+  )
 
-];
-
-
-viewer.resolutionScale=
-ratios[qualityMode];
+ ];
 
 
-$("quality").textContent=
-labels[qualityMode];
+ viewer.resolutionScale=
+ ratios[qualityMode];
 
 
-toast(
+ $("quality").textContent=
+ labels[qualityMode];
 
-labels[qualityMode]+
-" graphics"
 
-);
+ toast(
+  labels[qualityMode]+
+  " graphics"
+ );
 
 };
 
 
-// RESET
+/* RESET CAR */
 
 $("reset").onclick=
-
 ()=>{
 
-speed=0;
+ speed=0;
 
-pos={
-...lastSafe
-};
+ pos={...lastSafe};
 
-toast(
-"Car reset to road"
-);
+ toast(
+  "Car reset to road"
+ );
 
 };
 
 
-// KEYBOARD CONTROLS
+/* KEYBOARD */
 
 addEventListener(
+ "keydown",
+ e=>{
 
-"keydown",
-
-e=>{
-
-if(
-e.key==="ArrowUp" ||
-e.key==="w"
-)
-gas=1;
+  if(
+   e.key==="ArrowUp" ||
+   e.key==="w"
+  )
+  gas=1;
 
 
-if(
-e.key==="ArrowDown" ||
-e.key==="s"
-)
-brake=1;
+  if(
+   e.key==="ArrowDown" ||
+   e.key==="s"
+  )
+  brake=1;
 
 
-if(
-e.key==="ArrowLeft" ||
-e.key==="a"
-)
-steer=-1;
+  if(
+   e.key==="ArrowLeft" ||
+   e.key==="a"
+  )
+  steer=-1;
 
 
-if(
-e.key==="ArrowRight" ||
-e.key==="d"
-)
-steer=1;
+  if(
+   e.key==="ArrowRight" ||
+   e.key==="d"
+  )
+  steer=1;
 
 
-if(
-e.key===" "
-)
-handbrake=1;
+  if(e.key===" ")
+   handbrake=1;
 
-}
-
+ }
 );
 
 
 addEventListener(
+ "keyup",
+ e=>{
 
-"keyup",
-
-e=>{
-
-if(
-e.key==="ArrowUp" ||
-e.key==="w"
-)
-gas=0;
+  if(
+   e.key==="ArrowUp" ||
+   e.key==="w"
+  )
+  gas=0;
 
 
-if(
-e.key==="ArrowDown" ||
-e.key==="s"
-)
-brake=0;
+  if(
+   e.key==="ArrowDown" ||
+   e.key==="s"
+  )
+  brake=0;
 
 
-if(
-e.key==="ArrowLeft" ||
-e.key==="a" ||
-e.key==="ArrowRight" ||
-e.key==="d"
-)
-steer=0;
+  if(
+   e.key==="ArrowLeft" ||
+   e.key==="a" ||
+   e.key==="ArrowRight" ||
+   e.key==="d"
+  )
+  steer=0;
 
 
-if(
-e.key===" "
-)
-handbrake=0;
+  if(e.key===" ")
+   handbrake=0;
 
-}
-
+ }
 );
 
 </script>
